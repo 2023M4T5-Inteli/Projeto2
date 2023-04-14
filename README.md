@@ -47,10 +47,7 @@ Dentre os arquivos presentes na raiz do projeto, definem-se:
 
 ## 💻 Execução dos projetos
 
-Todos os notebooks do projeto tem o resultado de execução das células visíveis no próprio repositório Github.
-
-Para replicação (reexecução dos códigos), o botão `Open in Colab` disponível na página do arquivo neste repositório do Github.
-> Note que sem salvar uma cópia do notebook no seu Google Drive, não é possível salvar as alterações realizadas no arquivo.
+Escrever aqui como executar o projeto
 
 ## 🗃 Histórico de lançamentos e Adições
 
