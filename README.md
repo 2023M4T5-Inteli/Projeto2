@@ -11,7 +11,7 @@
 ## Integrantes: 
 - <a href="https://www.linkedin.com/in/eduarda-gonzaga-009794219/">Eduarda Gonzaga</a>
 - <a href="https://www.linkedin.com/in/yago-ara%C3%BAjo-do-vale-moreira-461816247/">Yago Araújo</a>
-- <a href="https://www.linkedin.com/in/lfcovas97/">Luis Fernando Covas</a> 
+- <a href="https://www.linkedin.com/in/lfcovas97/">Luiz Fernando Covas</a> 
 - <a href="https://www.linkedin.com/in/marcos-teixeira-37676a24a/">Marcos Teixeira</a> 
 - <a href="https://www.linkedin.com/in/thomaz-klifson-falc%C3%A3o-barboza-046490125/">Thomaz Klifson</a>
 - <a href="https://www.linkedin.com/in/raab-iane/">Raab Iane</a> 
