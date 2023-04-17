@@ -19,7 +19,7 @@
 
 ## 📝 Descrição
 
-Descrição do projeto aqui 
+KLIF é um dispositivo de rastreio para tablets/notebooks dentro da fábrica da PIRELLI, com o objetivo de monitorar sua localização em tempo real por meio de um dashboard com mapa, impedindo que saiam do ambiente fabril.
 
 ## 📁 Estrutura de pastas
 
@@ -28,12 +28,12 @@ Descrição do projeto aqui
     &emsp; &emsp; | --> analise_do_negocio<br>
     &emsp; &emsp; | --> experiencia_do_usuario<br>
     &emsp; &emsp; | --> politica_de_privacidade<br>
-  &emsp;| T5_G3_V4.5_Predictive_Model_Document.pdf<br>
-  &emsp;| T5_G3_V4.5_Predictive_Model_Document.docx<br>
-|--> notebooks<br>
-  &emsp;|--> 1.tratamento_inicial_agatha_dfs.ipynb<br>
-  &emsp;|--> 2.data_analysis_tratamento_target.ipynb<br>
-  &emsp;|--> 3.tratamento_modelo_final.ipynb<br>
+  &emsp;| T5_G2_V1_Instruction_Manual.pdf<br>
+  &emsp;| T5_G2_V1_IoT_Document.pdf<br>
+|--> src<br>
+ &emsp;|--> Backend<br>
+ &emsp;|--> Circuito<br>
+ &emsp;|--> Frontend<br>
 | readme.md<br>
 | license.txt
 
@@ -43,11 +43,11 @@ Dentre os arquivos presentes na raiz do projeto, definem-se:
 
 - <b>documentos</b>: aqui estarão todos os documentos do projeto. Há também uma pasta denominada <b>outros</b> onde estão presentes aqueles documentos complementares.
 
-- <b>notebooks</b>: todos os Jupyter Notebooks criados na plataforma Colab para desenvolvimento do projeto.
+- <b>src</b>: todo o código fonte criado para o desenvolvimento do projeto, incluindo os blocos de código do circuito, backend e frontend se aplicáveis.
 
 ## 💻 Execução dos projetos
 
-Escrever aqui como executar o projeto
+O conteúdo do documento "Manual de Instruções" que serve como guia para a execução deste projeto está disponível na pasta "documentos". Alternativamente, é possível acessá-lo através do link a seguir: https://github.com/2023M4T5-Inteli/Projeto2/tree/main/documentos/T5_G2_V1_Instruction_Manual.pdf
 
 ## 🗃 Histórico de lançamentos e Adições
 
