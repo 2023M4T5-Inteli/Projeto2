@@ -23,17 +23,12 @@ KLIF é um dispositivo de rastreio para tablets/notebooks dentro da fábrica da 
 
 ## 📁 Estrutura de pastas
 
-|--> documentos<br>
-  &emsp;| --> outros <br>
-    &emsp; &emsp; | --> analise_do_negocio<br>
-    &emsp; &emsp; | --> experiencia_do_usuario<br>
-    &emsp; &emsp; | --> politica_de_privacidade<br>
-  &emsp;| T5_G2_V1_Instruction_Manual.pdf<br>
-  &emsp;| T5_G2_V1_IoT_Document.pdf<br>
+|--> Apresentacoes<br>
+|--> Documentos<br>
+|--> Imagens<br>
 |--> src<br>
- &emsp;|--> Backend<br>
- &emsp;|--> Circuito<br>
- &emsp;|--> Frontend<br>
+ &emsp; &emsp;|--> Circuito<br>
+ &emsp; &emsp;|--> WebApp<br>
 | readme.md<br>
 | license.txt
 
@@ -41,9 +36,9 @@ Dentre os arquivos presentes na raiz do projeto, definem-se:
 
 - <b>readme.md</b>: arquivo que serve como guia e explicação geral sobre o projeto (o mesmo que você está lendo agora).
 
-- <b>documentos</b>: aqui estarão todos os documentos do projeto. Há também uma pasta denominada <b>outros</b> onde estão presentes aqueles documentos complementares.
+- <b>documentos</b>: aqui estarão todos os documentos do projeto. 
 
-- <b>src</b>: todo o código fonte criado para o desenvolvimento do projeto, incluindo os blocos de código do circuito, backend e frontend se aplicáveis.
+- <b>src</b>: todo o código fonte criado para o desenvolvimento do projeto, incluindo os blocos de código do circuito e webapp.
 
 ## 💻 Execução dos projetos
 
