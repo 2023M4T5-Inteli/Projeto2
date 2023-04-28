@@ -34,11 +34,20 @@ KLIF é um dispositivo de rastreio para tablets/notebooks dentro da fábrica da 
 
 Dentre os arquivos presentes na raiz do projeto, definem-se:
 
-- <b>readme.md</b>: arquivo que serve como guia e explicação geral sobre o projeto (o mesmo que você está lendo agora).
+- <b>Apresentacoes</b>: Pasta com os arquivos em pdf de todas as apresentações do grupo.
 
-- <b>documentos</b>: aqui estarão todos os documentos do projeto. 
+- <b>documentos</b>: Aqui estarão todos os documentos do projeto. 
 
-- <b>src</b>: todo o código fonte criado para o desenvolvimento do projeto, incluindo os blocos de código do circuito e webapp.
+- <b>Imagens</b>: Pasta com as imagens usadas no projeto.
+
+- <b>src</b>: Todo o código fonte criado para o desenvolvimento do projeto, incluindo os blocos de código do circuito e webapp.
+
+- <b>readme.md</b>: Arquivo que serve como guia e explicação geral sobre o projeto (o mesmo que você está lendo agora).
+
+- <b>license.txt</b>: Arquivo com a licença de uso dos produtores do projeto.
+
+
+
 
 ## 💻 Execução dos projetos
 
