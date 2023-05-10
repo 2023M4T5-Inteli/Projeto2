@@ -1,8 +1,14 @@
 #include <WiFi.h>
-const char* ssid = "Inteli-COLLEGE";
-const char* password = "QazWsx@123";
+
+// const char* ssid = "Inteli-COLLEGE";
+// const char* password = "QazWsx@123";
+
+const char* ssid;
+const char* password;
+
 const char* serverAddress = "10.128.69.94"; // Endereço IP local do servidor
 int serverPort = 80; // Porta usada pelo servidor
+
 void setup() {
   Serial.begin(9600);
   WiFi.begin(ssid, password);

@@ -59,9 +59,4 @@ void loop() {
   Serial.println(mensagem); // printa no Serial 
   delay(500);
 
-
-
-  
-  
-
 }

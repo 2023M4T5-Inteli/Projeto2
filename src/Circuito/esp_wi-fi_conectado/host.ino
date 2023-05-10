@@ -1,7 +1,10 @@
 #include <WiFi.h>
 
-const char* ssid = "Inteli-COLLEGE";
-const char* password = "QazWsx@123";
+//const char* ssid = "Inteli-COLLEGE";
+//const char* password = "QazWsx@123";
+
+const char* ssid = "SHARE-RESIDENTE";
+const char* password = "Share@residente23";
 
 void setup() {
   pinMode(4, OUTPUT);
@@ -18,7 +21,6 @@ void setup() {
   Serial.print("Endereço IP: ");
   Serial.println(WiFi.localIP());
 }
-
 void loop() {
   // Seu código aqui
 }
