@@ -45,7 +45,7 @@ void serverConect(){
   }
 }
 
-String returnMac(){
+/*String returnMac(){
 
   String bssidStr = WiFi.BSSIDstr(); //pega a string do endereço mac
 
@@ -58,19 +58,15 @@ String returnMac(){
   return mensagem;
   
 
-}
+}*/
 
-void digitarMsn(){
-  Serial.println("digite uma mensagem:");
-  if (Serial.available() > 0) {
-    String digita = Serial.readStringUntil('\n');
-    client.println(digita + '\n');
-  }
+//void digitarMsn(){
+  
 
 
-}
+//}
 
-void identificaLocal(String mensagem){
+/*void identificaLocal(String mensagem){
    // Verifica se a mensagem é um endereço MAC válido
     if (mensagem.length() == 12) {
       // Verifica se o endereço MAC já está na lista
@@ -100,10 +96,10 @@ void identificaLocal(String mensagem){
     }
  
     //Verifica se o outro dispositivo mandou mensagem.
-    client.available();
+    
     if(mensagem == macs[cont]){
-    Serial.println("ESP32 = SALA");
-    client.println("ESP32 = SALA");
+    Serial.println("ESP32 na SALA");
+    client.println("ESP32 na SALA");
     } 
     cont++;
     if(mensagem == macs[cont]){
@@ -124,7 +120,7 @@ void identificaLocal(String mensagem){
 
     // Envia o Endereço MAC para o servidor
 
-}
+}*/
 
 
 void setup() {
@@ -146,14 +142,18 @@ void loop() {
   Serial.println("Enviando Mensagem ao Server:");
 
   //Chama a função returnMac
-  digitarMsn();
-  delay(5000);
   //Chama a função identificaLocal
-  returnMac();
-  delay(5000);
-  identificaLocal(returnMac());
+ // returnMac();
+  //delay(1000);
+  //identificaLocal(returnMac());
 
-  
+
+  Serial.println("digite uma mensagem:");
+  if (Serial.available() >0 ) {
+    String digita = Serial.readStringUntil('\n');
+    client.println(digita + '\n');
+  }
+    
   
 
 }
