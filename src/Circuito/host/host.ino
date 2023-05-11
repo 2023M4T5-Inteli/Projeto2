@@ -15,8 +15,8 @@ LiquidCrystal_I2C lcd(LCD_ADDRESS, LCD_COLUMNS, LCD_ROWS);
 
 
 //Nome e Senha da rede WIFI
-const char* ssid = "Thomaz Klifson";
-const char* password = "inteli10";
+const char* ssid = "Inteli-COLLEGE";
+const char* password = "QazWsx@123";
 
 //Inicia Server na porta 80
 WiFiServer server(80);
@@ -44,14 +44,7 @@ void LCD(){
   lcd.backlight();
 }
 
-void textoLcd(){
-  lcd.setCursor(0, 0);
-  lcd.print(mensagem);
-  // Posiciona o cursor na segunda linha, primeira coluna e imprime " "
-  delay(5000)
-  lcd.setCursor(0, 1);
-  lcd.print(mensagem);
-}
+
 
 void connectWifi(){
   //Se o ESP32 não conectou no WIFI ele entra no loop e gera a mensagem de "Conectando ao WiFi..."
@@ -64,7 +57,7 @@ void connectWifi(){
 
 void infoNet(){
   //Quando o ESP32 se conecta no WIFI ele retorna no Serial que está conectado a rede e o IpLocal.
-/  Serial.println("Conectado ao WiFi!");
+  Serial.println("Conectado ao WiFi!");
   Serial.print("Endereço IP: ");
   Serial.println(WiFi.localIP());
 
@@ -106,7 +99,16 @@ void mensagemClient(){
   //Da um delay de 0.5segundos
   delay(500);
 
+  lcd.setCursor(0, 0);
+  lcd.print(mensagem);
+  // Posiciona o cursor na segunda linha, primeira coluna e imprime " "
+  delay(5000);
+  lcd.setCursor(0, 1);
+  lcd.print(mensagem);
+
 }
+
+
 
 }
 
@@ -159,8 +161,6 @@ void loop() {
   verificaCliente();
   //Chama a função mensagemCliente.
   mensagemClient();
-  //Chama a função textoLcd.
-  textoLcd();
   //Liga o Led amarelo
   digitalWrite(conectandoLedAmarelo, HIGH);
 

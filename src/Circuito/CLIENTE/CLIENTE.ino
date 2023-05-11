@@ -1,12 +1,13 @@
 #include <WiFi.h>
 #include <WiFiClient.h>
 
-const char* ssid = "iPhone";
-const char* password = "12376528";
-const char* serverAddress = "10.254.18.212"; // Endereço IP local do servidor
+const char* ssid = "Inteli-COLLEGE";
+const char* password = "QazWsx@123";
+const char* serverAddress = "10.128.69.113"; // Endereço IP local do servidor
 int serverPort = 80; // Porta usada pelo servidor
 WiFiClient client;
-  int cont = 0;
+int cont = 0;
+
 
 // Número máximo de endereços MAC que podem ser armazenados
 const int MAX_MACS = 5;
@@ -44,23 +45,32 @@ void serverConect(){
   }
 }
 
-void returnMac(){
+String returnMac(){
+
   String bssidStr = WiFi.BSSIDstr(); //pega a string do endereço mac
 
   //Salva o endereço MAC na varial mensagem
-
   String mensagem = bssidStr; // acho q o erro ta aqui, o bssidStr não está atualizando quando eu uso o replace
-
-  //Verifica se o outro dispositivo mandou mensagem.
-  client.available();
-
-  // Envia o Endereço MAC para o servidor
-  client.println(mensagem);
+  
+  mensagem.replace(":","");
   Serial.println(mensagem); // printa no Serial 
+
+  return mensagem;
+  
 
 }
 
-void identificaLocal(){
+void digitarMsn(){
+  Serial.println("digite uma mensagem:");
+  if (Serial.available() > 0) {
+    String digita = Serial.readStringUntil('\n');
+    client.println(digita + '\n');
+  }
+
+
+}
+
+void identificaLocal(String mensagem){
    // Verifica se a mensagem é um endereço MAC válido
     if (mensagem.length() == 12) {
       // Verifica se o endereço MAC já está na lista
@@ -76,7 +86,6 @@ void identificaLocal(){
         // Adiciona o endereço MAC à lista
         if (numMacs < MAX_MACS) {
           macs[numMacs] = mensagem;
-          client.println(macs[numMacs]); // joga o para o serial do client 
           numMacs++;
           delay(500);
           Serial.println("Endereço MAC adicionado à lista.");
@@ -90,22 +99,30 @@ void identificaLocal(){
       Serial.println("Endereço MAC inválido.");
     }
  
+    //Verifica se o outro dispositivo mandou mensagem.
+    client.available();
     if(mensagem == macs[cont]){
-      Serial.println("marcos ta no 1");
+    Serial.println("ESP32 = SALA");
+    client.println("ESP32 = SALA");
     } 
     cont++;
     if(mensagem == macs[cont]){
-      Serial.println("marcos ta no 2");
+      Serial.println("ESP32 = OB");
+      client.println("ESP32 = OB");
     } 
     cont++;
     if(mensagem == macs[cont]){
-      Serial.println("marcos ta no 3");
+      Serial.println("ESP32 = ANDAR 3");
+      client.println("ESP32 = ANDAR 3");
     } 
     cont++;
     if(mensagem == macs[cont]){
-      Serial.println("marcos ta no 4");
+      Serial.println("ESP32 = ANDAR 2");
+      client.println("ESP32 = ANDAR 2");
     }
     cont= 0;
+
+    // Envia o Endereço MAC para o servidor
 
 }
 
@@ -129,9 +146,13 @@ void loop() {
   Serial.println("Enviando Mensagem ao Server:");
 
   //Chama a função returnMac
-  returnMac();
+  digitarMsn();
+  delay(5000);
   //Chama a função identificaLocal
-  identificaLocal()
+  returnMac();
+  delay(5000);
+  identificaLocal(returnMac());
+
   
   
 
