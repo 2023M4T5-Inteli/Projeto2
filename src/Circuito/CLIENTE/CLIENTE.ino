@@ -148,12 +148,16 @@ void loop() {
   //identificaLocal(returnMac());
 
 
-  Serial.println("digite uma mensagem:");
-  if (Serial.available() >0 ) {
-    String digita = Serial.readStringUntil('\n');
-    client.println(digita + '\n');
+ // Serial.println("digite uma mensagem:");
+  //if (Serial.available() >0 ) {
+  //  String digita = Serial.readStringUntil('\n');
+   // client.println(digita + '\n');
+ // }
+  client.println("ESP em sala");
+  String mac = WiFi.BSSIDstr();
+  mac.replace(":","");
+  Serial.println(mac);
+  if(!client.connected()){
+    Serial.println("eita saiu");
   }
-    
-  
-
 }
