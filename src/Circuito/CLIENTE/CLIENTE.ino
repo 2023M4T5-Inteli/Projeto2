@@ -1,11 +1,19 @@
+//Chama as bibliotecas
 #include <WiFi.h>
 #include <WiFiClient.h>
 
+//Salva o nome a rede e o IP em constantes.
 const char* ssid = "Inteli-COLLEGE";
 const char* password = "QazWsx@123";
 const char* serverAddress = "10.128.69.113"; // Endereço IP local do servidor
+
+//Salva na variavel serverPort a porta 80 do servidor
 int serverPort = 80; // Porta usada pelo servidor
+
+//Salva Wifi Client em client.
 WiFiClient client;
+
+//Salva 0 na variavel cont
 int cont = 0;
 
 
@@ -14,6 +22,7 @@ const int MAX_MACS = 5;
 
 String macs[MAX_MACS];
 
+//Salva 0 na variavel numMacs
 int numMacs = 0;
 
 void wifiWait(){
@@ -153,10 +162,17 @@ void loop() {
   //  String digita = Serial.readStringUntil('\n');
    // client.println(digita + '\n');
  // }
+  
+  //Manda para o client que o "ESP está na sala".
   client.println("ESP em sala");
+
+  //Salva o endereço MAC na variavel mac;
   String mac = WiFi.BSSIDstr();
+  //Pega o endereço MAC e remove os pontos.
   mac.replace(":","");
+  //printa o endereço MAC no Serial
   Serial.println(mac);
+  //Verifica se o cliente desconectou e se desconectou printa no Serial "eita saiu" 
   if(!client.connected()){
     Serial.println("eita saiu");
   }
