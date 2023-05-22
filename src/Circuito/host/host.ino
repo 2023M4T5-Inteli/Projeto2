@@ -4,6 +4,7 @@
 #include <WiFiClient.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
+#include <PubSubClient.h>
 
 //Incluindo constantes
 #define LCD_ADDRESS 0x27
@@ -19,11 +20,19 @@ LiquidCrystal_I2C lcd(LCD_ADDRESS, LCD_COLUMNS, LCD_ROWS);
 const char* ssid = "Inteli-COLLEGE";
 const char* password = "QazWsx@123";
 
+
+// variáveis para estabelecer conexão MQTT
+const char* mqttServer = "industrial.api.ubidots.com";
+const int mqttPort = 1883;
+const char* mqttUser = "";
+const char* mqttPassword = "646ba57f256c0f31fb1cfc96";
+
 //Definindo o server (server80)
 WiFiServer server(80);
 
 //Definindo WifiClient na variavel client.
 WiFiClient client;
+PubSubClient client(client);
 
 //Salvando os pinos dos leds em variaveis respectivas.
 const int naoConectadoLedVermelho = 15;
@@ -36,6 +45,13 @@ float distanciaInch;
 const int pinoBuzzer = 25;
 const int pinoTrig = 26;
 const int pinoEcho = 27;
+
+// função para lidar com as mensagens assíncronas do MQTT
+void callback(char* topic, byte* payload, unsigned int length) {
+
+  // Implemente o código para tratar as mensagens recebidas aqui
+}
+
 
 void quebrou() {
   digitalWrite(pinoTrig, LOW);
@@ -70,13 +86,12 @@ void LCD() {
 }
 
 void connectWifi() {
-  //Enquanto não se conecta no Wifi entra num loop que liga o LED vermelho eretorna uma mensagem "conectando ao WIFI...".    
+  //Enquanto não se conecta no Wifi entra num loop que liga o LED vermelho eretorna uma mensagem "conectando ao WIFI...".
   while (WiFi.status() != WL_CONNECTED) {
     quebrou();
     digitalWrite(naoConectadoLedVermelho, HIGH);
     delay(2000);
     Serial.println("Conectando ao WiFi...");
-    
   }
 }
 
@@ -88,16 +103,38 @@ void infoNet() {
 }
 
 void iniciaServer() {
-  //Inicia o Server na porta 80. 
+  //Inicia o Server na porta 80.
   server.begin();
   //Printa no Serial "Servidor iniciado na porta 80."
   Serial.println("Servidor iniciado na porta 80.");
+}
+
+
+void conectaMQTT() {
+  Serial.println("Conectando ao MQTT...");
+  if (client.connect("ESP32Client", mqttUser, mqttPassword)) {
+    Serial.println("Conexão via MQTT obtida");
+  } else {
+    Serial.print("Houve falha na conexão MQTT: ")
+      Serial.print(client.state());
+    Serial.println("Tentando conectar novamente...");
+    delay(600);
+  }
+}
+
+void enviaMensagemMQTT() {
+  float valor = 25.5;  // Substitua pelo valor que você deseja enviar
+  char mensagem[20];
+  sprintf(mensagem, "%.2f", valor);
+
+  client.publish("/topico/publicacao", mensagem);
 }
 
 void verificaCliente() {
   //Se o cliente não está conectado o Led amarelo fica piscando até o client(Outro ESP32).
   if (!client.connected()) {
     digitalWrite(conectandoLedAmarelo, HIGH);
+    conectaMQTT();
     delay(1000);
     digitalWrite(conectandoLedAmarelo, LOW);
     delay(1000);
@@ -110,7 +147,7 @@ void mensagemCliente() {
   //Verifica se o client está conectado.
   if (client.connected()) {
     //Verifica se o client mandou mensagem.
-    if(client.available()){
+    if (client.available()) {
       //Limpa as informações do Display LCD
       lcd.clear();
       //Pega a mensagem que o client manda e quarda na varial "mac".
@@ -130,24 +167,19 @@ void mensagemCliente() {
       delay(1500);
       lcd.clear();
     }
-
   }
   //Verifica se o client não está conectado.
-  if(!client.connected()){
+  if (!client.connected()) {
     //Limpa as informações do Display LCD
     lcd.clear();
-    //Mostra na primeira linha da tela LCD que o ESP saiu do Local 
+    //Mostra na primeira linha da tela LCD que o ESP saiu do Local
     lcd.setCursor(0, 0);
     lcd.print("ESP saiu");
     //Mostra na segunda linha da tela LCD de que local o ESP saiu do
     lcd.setCursor(0, 1);
     lcd.print("MAC:FC5C45004FC8");
     Serial.println("esp saiu; 2if desconectado");
-
-
   }
-    
-
 }
 
 void alertaConexao(int led, char* message) {
@@ -161,7 +193,7 @@ void alertaConexao(int led, char* message) {
 }
 
 void setup() {
-  //Seta o serial que sairá as informações de print. 
+  //Seta o serial que sairá as informações de print.
   Serial.begin(9600);
   //Define os pinos de saida do Buzzer e do Trig COVAS
   pinMode(pinoTrig, OUTPUT);
@@ -173,9 +205,17 @@ void setup() {
   pinMode(naoConectadoLedVermelho, OUTPUT);
   pinMode(conectandoLedAmarelo, OUTPUT);
   pinMode(conectadoLedVerde, OUTPUT);
+
+
+  // conexão MQTT
+  client.setServer(mqttServer, mqttPort);
+  client.setCallback(callback);
+
+
+
   //Chama a função quebrou.
   quebrou();
-  //Conecta ao Wifi 
+  //Conecta ao Wifi
   WiFi.begin(ssid, password);
   //Chama a função connectWifi
   connectWifi();
