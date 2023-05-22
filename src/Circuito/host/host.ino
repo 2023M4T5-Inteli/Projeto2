@@ -50,6 +50,11 @@ const int pinoEcho = 27;
 void callback(char* topic, byte* payload, unsigned int length) {
 
   // Implemente o código para tratar as mensagens recebidas aqui
+  Serial.print("Mensagem está ok");
+  Serial.print(topic);
+  for(int i = 0; i< length; i++){
+    Serial.print((char)payload[i]);
+  }
 }
 
 
@@ -195,6 +200,11 @@ void alertaConexao(int led, char* message) {
 void setup() {
   //Seta o serial que sairá as informações de print.
   Serial.begin(9600);
+
+  // inicia função MQTT
+  client.begin(callback);
+  client.ubidotsSubscribe("detecao");
+
   //Define os pinos de saida do Buzzer e do Trig COVAS
   pinMode(pinoTrig, OUTPUT);
   pinMode(pinoBuzzer, OUTPUT);
