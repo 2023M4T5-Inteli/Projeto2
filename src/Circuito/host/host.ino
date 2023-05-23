@@ -5,6 +5,7 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include <PubSubClient.h>
+#include "UbidotsEsp32Mqtt.h"
 
 //Incluindo constantes
 #define LCD_ADDRESS 0x27
@@ -19,20 +20,20 @@ LiquidCrystal_I2C lcd(LCD_ADDRESS, LCD_COLUMNS, LCD_ROWS);
 //Definindo o nome e a senha da rede.
 const char* ssid = "Inteli-COLLEGE";
 const char* password = "QazWsx@123";
-
-
-// variáveis para estabelecer conexão MQTT
-const char* mqttServer = "industrial.api.ubidots.com";
-const int mqttPort = 1883;
-const char* mqttUser = "";
-const char* mqttPassword = "646ba57f256c0f31fb1cfc96";
+const char* UBIDOTS_TOKEN = "BBFF-BBFF-xWXqB1mRuV2we8DAZStWtIPrPMNdcc";
+const char* DEVICE_LABEL = "KLIF";
+const char* VARIABLE_LABEL = "esp-quebrado";
+const int PUBLISH_FREQUENCY = 1000; // Update rate in milliseconds
+unsigned long timer;
 
 //Definindo o server (server80)
 WiFiServer server(80);
 
+// conexão com o ubidots via token
+Ubidots ubidots(UBIDOTS_TOKEN);
+
 //Definindo WifiClient na variavel client.
 WiFiClient client;
-PubSubClient client(client);
 
 //Salvando os pinos dos leds em variaveis respectivas.
 const int naoConectadoLedVermelho = 15;
@@ -46,16 +47,6 @@ const int pinoBuzzer = 25;
 const int pinoTrig = 26;
 const int pinoEcho = 27;
 
-// função para lidar com as mensagens assíncronas do MQTT
-void callback(char* topic, byte* payload, unsigned int length) {
-
-  // Implemente o código para tratar as mensagens recebidas aqui
-  Serial.print("Mensagem está ok");
-  Serial.print(topic);
-  for(int i = 0; i< length; i++){
-    Serial.print((char)payload[i]);
-  }
-}
 
 
 void quebrou() {
@@ -93,7 +84,7 @@ void LCD() {
 void connectWifi() {
   //Enquanto não se conecta no Wifi entra num loop que liga o LED vermelho eretorna uma mensagem "conectando ao WIFI...".
   while (WiFi.status() != WL_CONNECTED) {
-    quebrou();
+
     digitalWrite(naoConectadoLedVermelho, HIGH);
     delay(2000);
     Serial.println("Conectando ao WiFi...");
@@ -115,35 +106,16 @@ void iniciaServer() {
 }
 
 
-void conectaMQTT() {
-  Serial.println("Conectando ao MQTT...");
-  if (client.connect("ESP32Client", mqttUser, mqttPassword)) {
-    Serial.println("Conexão via MQTT obtida");
-  } else {
-    Serial.print("Houve falha na conexão MQTT: ")
-      Serial.print(client.state());
-    Serial.println("Tentando conectar novamente...");
-    delay(600);
-  }
-}
 
-void enviaMensagemMQTT() {
-  float valor = 25.5;  // Substitua pelo valor que você deseja enviar
-  char mensagem[20];
-  sprintf(mensagem, "%.2f", valor);
-
-  client.publish("/topico/publicacao", mensagem);
-}
 
 void verificaCliente() {
   //Se o cliente não está conectado o Led amarelo fica piscando até o client(Outro ESP32).
   if (!client.connected()) {
     digitalWrite(conectandoLedAmarelo, HIGH);
-    conectaMQTT();
     delay(1000);
     digitalWrite(conectandoLedAmarelo, LOW);
     delay(1000);
-    Serial.println("verifica cliente nao conectado");
+    Serial.println("Aguardando um Cliente");
     return;
   }
 }
@@ -179,11 +151,10 @@ void mensagemCliente() {
     lcd.clear();
     //Mostra na primeira linha da tela LCD que o ESP saiu do Local
     lcd.setCursor(0, 0);
-    lcd.print("ESP saiu");
+    lcd.print("Esperando cliente");
     //Mostra na segunda linha da tela LCD de que local o ESP saiu do
     lcd.setCursor(0, 1);
     lcd.print("MAC:FC5C45004FC8");
-    Serial.println("esp saiu; 2if desconectado");
   }
 }
 
@@ -197,13 +168,28 @@ void alertaConexao(int led, char* message) {
   }
 }
 
+// void callback(char* topic, byte* payload, unsigned int length) {
+//   Serial.print("Message arrived [");
+//   Serial.print(topic);
+//   Serial.print("] ");
+//   for (int i = 0; i < length; i++) {
+//     Serial.print((char)payload[i]);
+//   }
+//   Serial.println();
+
+//   // Verificar a distância e enviar mensagem para o broker MQTT se for menor que 5
+//   if (distancCm < 5) {
+//     if (client.connected()) {
+//       String mensagem = "ESP32 saiu!";
+//       client.publish("seu/topico/aqui", mensagem.c_str());
+//     }
+//   }
+// }
+
+
 void setup() {
   //Seta o serial que sairá as informações de print.
   Serial.begin(9600);
-
-  // inicia função MQTT
-  client.begin(callback);
-  client.ubidotsSubscribe("detecao");
 
   //Define os pinos de saida do Buzzer e do Trig COVAS
   pinMode(pinoTrig, OUTPUT);
@@ -215,13 +201,6 @@ void setup() {
   pinMode(naoConectadoLedVermelho, OUTPUT);
   pinMode(conectandoLedAmarelo, OUTPUT);
   pinMode(conectadoLedVerde, OUTPUT);
-
-
-  // conexão MQTT
-  client.setServer(mqttServer, mqttPort);
-  client.setCallback(callback);
-
-
 
   //Chama a função quebrou.
   quebrou();
@@ -237,9 +216,27 @@ void setup() {
   iniciaServer();
   //Chama a função LCD.
   LCD();
+
+    // put your setup code here, to run once:
+  Serial.begin(115200); 
+
+
+  ubidots.setDebug(true);  // uncomment this to make debug messages available
+  ubidots.connectToWifi(ssid, password);
+  ubidots.setCallback(callback);
+  ubidots.setup();
+  ubidots.reconnect();
+  ubidots.subscribeLastValue(DEVICE_LABEL, VARIABLE_LABEL); 
 }
 
 void loop() {
+
+  if (millis() - timer > PUBLISH_FREQUENCY) {
+    ubidots.add(VARIABLE_LABEL, 0);  // Insira variável e dispositivo a serem publicados
+    ubidots.publish(DEVICE_LABEL);
+    timer = millis();
+  }
+
   //Chama a função quebrou.
   quebrou();
   //Da um delay de 0.5 segundos.
@@ -256,4 +253,10 @@ void loop() {
   mensagemCliente();
   //Da um delay de 0.5 segundos.
   delay(500);
+
+  if (!ubidots.connected()) {
+    ubidots.reconnect();
+    ubidots.subscribeLastValue(DEVICE_LABEL, VARIABLE_LABEL);
+  }
+  ubidots.loop();
 }
