@@ -27,7 +27,7 @@ const int PUBLISH_FREQUENCY = 1000; // Update rate in milliseconds
 unsigned long timer;
 
 //Definindo o server (server80)
-WiFiServer server(80);
+WiFiServer server(443);
 
 // conexão com o ubidots via token
 Ubidots ubidots(UBIDOTS_TOKEN);
@@ -122,7 +122,7 @@ void verificaCliente() {
 
 void mensagemCliente() {
   //Verifica se o client está conectado.
-  if (client.connected()) {
+  
     //Verifica se o client mandou mensagem.
     if (client.available()) {
       //Limpa as informações do Display LCD
@@ -144,18 +144,17 @@ void mensagemCliente() {
       delay(1500);
       lcd.clear();
     }
-  }
   //Verifica se o client não está conectado.
-  if (!client.connected()) {
-    //Limpa as informações do Display LCD
-    lcd.clear();
-    //Mostra na primeira linha da tela LCD que o ESP saiu do Local
-    lcd.setCursor(0, 0);
-    lcd.print("Esperando cliente");
-    //Mostra na segunda linha da tela LCD de que local o ESP saiu do
-    lcd.setCursor(0, 1);
-    lcd.print("MAC:FC5C45004FC8");
-  }
+  // if (!client.connected()) {
+  //   //Limpa as informações do Display LCD
+  //   lcd.clear();
+  //   //Mostra na primeira linha da tela LCD que o ESP saiu do Local
+  //   lcd.setCursor(0, 0);
+  //   lcd.print("Esperando cliente");
+  //   //Mostra na segunda linha da tela LCD de que local o ESP saiu do
+  //   lcd.setCursor(0, 1);
+  //   lcd.print("MAC:FC5C45004FC8");
+  // }
 }
 
 void alertaConexao(int led, char* message) {
@@ -181,7 +180,8 @@ void alertaConexao(int led, char* message) {
 //   if (distancCm < 5) {
 //     if (client.connected()) {
 //       String mensagem = "ESP32 saiu!";
-//       client.publish("seu/topico/aqui", mensagem.c_str());
+//       // client.publish("seu/topico/aqui", mensagem.c_str());
+//       Serial.println(mensagem);
 //     }
 //   }
 // }
@@ -218,24 +218,24 @@ void setup() {
   LCD();
 
     // put your setup code here, to run once:
-  Serial.begin(115200); 
+  //Serial.begin(115200); 
 
 
-  ubidots.setDebug(true);  // uncomment this to make debug messages available
-  ubidots.connectToWifi(ssid, password);
-  ubidots.setCallback(callback);
-  ubidots.setup();
-  ubidots.reconnect();
-  ubidots.subscribeLastValue(DEVICE_LABEL, VARIABLE_LABEL); 
+  // ubidots.setDebug(true);  // uncomment this to make debug messages available
+  // ubidots.connectToWifi(ssid, password);
+  // // ubidots.setCallback(callback);
+  // ubidots.setup();
+  // ubidots.reconnect();
+  // ubidots.subscribeLastValue(DEVICE_LABEL, VARIABLE_LABEL); 
 }
 
 void loop() {
 
-  if (millis() - timer > PUBLISH_FREQUENCY) {
-    ubidots.add(VARIABLE_LABEL, 0);  // Insira variável e dispositivo a serem publicados
-    ubidots.publish(DEVICE_LABEL);
-    timer = millis();
-  }
+  // if (millis() - timer > PUBLISH_FREQUENCY) {
+  //   ubidots.add(VARIABLE_LABEL, 0);  // Insira variável e dispositivo a serem publicados
+  //   ubidots.publish(DEVICE_LABEL);
+  //   timer = millis();
+  // }
 
   //Chama a função quebrou.
   quebrou();
@@ -248,15 +248,21 @@ void loop() {
   //Chama a função verificaCliente.
   verificaCliente();
   //Da um delay de 0.5 segundos.
-  delay(500);
-  //Chama a função mensagemCliente.
   mensagemCliente();
+
+  delay(500);
+  
+  if (!client.connected()){
+    Serial.println("ainda falta");
+
+  }
+  //Chama a função mensagemCliente.
   //Da um delay de 0.5 segundos.
   delay(500);
 
-  if (!ubidots.connected()) {
-    ubidots.reconnect();
-    ubidots.subscribeLastValue(DEVICE_LABEL, VARIABLE_LABEL);
-  }
-  ubidots.loop();
+  // if (!ubidots.connected()) {
+  //   ubidots.reconnect();
+  //   ubidots.subscribeLastValue(DEVICE_LABEL, VARIABLE_LABEL);
+  // }
+  // ubidots.loop();
 }
