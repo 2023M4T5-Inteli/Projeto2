@@ -5,10 +5,10 @@
 //Salva o nome a rede e o IP em constantes.
 const char* ssid = "Inteli-COLLEGE";
 const char* password = "QazWsx@123";
-const char* serverAddress = "10.128.69.113"; // Endereço IP local do servidor
+const char* serverAddress = "10.128.66.252"; // Endereço IP local do servidor
 
 //Salva na variavel serverPort a porta 80 do servidor
-int serverPort = 80; // Porta usada pelo servidor
+int serverPort = 443; // Porta usada pelo servidor
 
 //Salva Wifi Client em client.
 WiFiClient client;
@@ -48,9 +48,9 @@ void infoRede(){
 void serverConect(){
 
   // Se o client não conecta no ip e na porta ele entra num loop que volta no Serial a mensagem : "Falha na conexão com o server."
-  while (!client.connect(serverAddress, 80)) {
+  while (!client.connect(serverAddress, serverPort)) {
     Serial.println("Falha na conexão com o server.");
-    delay(1000);
+    delay(500);
   }
 }
 
@@ -164,7 +164,7 @@ void loop() {
  // }
   
   //Manda para o client que o "ESP está na sala".
-  client.println("ESP em sala");
+  //client.println("ESP em sala");
 
   //Salva o endereço MAC na variavel mac;
   String mac = WiFi.BSSIDstr();
@@ -172,8 +172,8 @@ void loop() {
   mac.replace(":","");
   //printa o endereço MAC no Serial
   Serial.println(mac);
+  client.println("ESP32 = OB");
+  Serial.println("...");
   //Verifica se o cliente desconectou e se desconectou printa no Serial "eita saiu" 
-  if(!client.connected()){
-    Serial.println("eita saiu");
-  }
+  delay(1000);
 }
