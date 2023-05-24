@@ -19,7 +19,7 @@ const char* ssid = "Inteli-COLLEGE";
 const char* password = "QazWsx@123";
 
 //Inicia Server na porta 80
-WiFiServer server(80);
+WiFiServer server(3002);
 
 //Cria uma variavel client
 WiFiClient client;
@@ -55,7 +55,7 @@ void connectWifi(){
   }
 }
 
-void infoNet(){
+void infoNet() {
   //Quando o ESP32 se conecta no WIFI ele retorna no Serial que está conectado a rede e o IpLocal.
   Serial.println("Conectado ao WiFi!");
   Serial.print("Endereço IP: ");
@@ -66,7 +66,7 @@ void infoNet(){
 void iniciaServer(){
   //inicia o server na porta 80
   server.begin();
-  Serial.println("Servidor iniciado na porta 80.");
+  Serial.println("Servidor iniciado na porta 3002.");
 }
 
 void verificaCliente(){
