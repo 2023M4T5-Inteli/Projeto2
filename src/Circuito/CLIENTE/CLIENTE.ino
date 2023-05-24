@@ -3,8 +3,8 @@
 
 const char* ssid = "Inteli-COLLEGE";
 const char* password = "QazWsx@123";
-const char* serverAddress = "10.128.69.113"; // Endereço IP local do servidor
-int serverPort = 80; // Porta usada pelo servidor
+const char* serverAddress = "10.128.66.252"; // Endereço IP local do servidor
+int serverPort = 3002; // Porta usada pelo servidor
 WiFiClient client;
   int cont = 0;
 
@@ -38,7 +38,7 @@ void infoRede(){
 void serverConect(){
 
   // Se o client não conecta no ip e na porta ele entra num loop que volta no Serial a mensagem : "Falha na conexão com o server."
-  while (!client.connect(serverAddress, 80)) {
+  while (!client.connect(serverAddress, serverPort)) {
     Serial.println("Falha na conexão com o server.");
     delay(1000);
   }
@@ -149,5 +149,8 @@ void loop() {
     // Envia a mensagem para o servidor
     client.println(mensagem);
     Serial.println(mensagem);
+    
+    delay(2000);
+    returnMac();
   }
 }
