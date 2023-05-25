@@ -157,12 +157,12 @@ void mensagemClient() {
     //Da um delay de 0.5segundos
     // delay(500);
 
-    // lcd.setCursor(0, 0);
-    // lcd.print(mensagem);
-    // // Posiciona o cursor na segunda linha, primeira coluna e imprime " "
-    // delay(5000);
-    // lcd.setCursor(0, 1);
-    // lcd.print(mensagem);
+    lcd.setCursor(0, 0);
+    lcd.print(mensagem);
+    // Posiciona o cursor na segunda linha, primeira coluna e imprime " "
+    delay(5000);
+    lcd.setCursor(0, 1);
+    lcd.print("ESP3 SETOR 2");
   }
 }
 
@@ -273,4 +273,5 @@ void loop() {
   mensagemClient();
   //Liga o Led amarelo
   digitalWrite(conectandoLedAmarelo, HIGH);
+  lcd.clear();
 }
