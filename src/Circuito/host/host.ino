@@ -35,7 +35,7 @@ const char *VARIABLE_LABEL = "desconectado";                        // Put here 
 const char *VARIABLE_LABEL2 = "aguardando";                         // Put here your Variable label to which data  will be published
 const char *VARIABLE_LABEL3 = "conectado";                          // Put here your Variable label to which data  will be published
 const char *VARIABLE_LABEL4 = "status_estado_ESP";                  // Put here your Variable label to which data  will be published
-const char *VARIABLE_LABEL5 = "IP_";                  // Put here your Variable label to which data  will be published
+// const char *VARIABLE_LABEL5 = "IP_";                  // Put here your Variable label to which data  will be published
 
 const int PUBLISH_FREQUENCY = 5000;  // Update rate in milliseconds
 
@@ -143,24 +143,30 @@ void mensagemClient() {
     // Lê a mensagem enviada pelo cliente
     String mensagem = client.readStringUntil('\n');
 
+    
     //retorna uma nova string sem os espaços em branco.
     mensagem.trim();
 
     // Imprime a mensagem recebida do client.
+
+
+
     Serial.print("Mensagem recebida: ");
     Serial.println(mensagem);
 
     //Da um delay de 0.5segundos
-    delay(500);
+    // delay(500);
 
-    lcd.setCursor(0, 0);
-    lcd.print(mensagem);
-    // Posiciona o cursor na segunda linha, primeira coluna e imprime " "
-    delay(5000);
-    lcd.setCursor(0, 1);
-    lcd.print(mensagem);
+    // lcd.setCursor(0, 0);
+    // lcd.print(mensagem);
+    // // Posiciona o cursor na segunda linha, primeira coluna e imprime " "
+    // delay(5000);
+    // lcd.setCursor(0, 1);
+    // lcd.print(mensagem);
   }
 }
+
+
 
 void alertaConexao(int led, char *message) {
   while (true) {
@@ -223,14 +229,6 @@ void loop() {
   quebrou();
   //Liga o Led Verde
   digitalWrite(conectadoLedVerde, HIGH);
-  //Chama a função verificaCliente.
-  verificaCliente();
-  //Chama a função mensagemCliente.
-  mensagemClient();
-
-
-  //Liga o Led amarelo
-  digitalWrite(conectandoLedAmarelo, HIGH);
 
 
 
@@ -241,8 +239,6 @@ void loop() {
   }
   if (abs(millis() - timer) > PUBLISH_FREQUENCY)  // triggers the routine every 5 seconds
   {
-    String testando = client.readStringUntil('\n');
-    int testando123 = testando.toInt();
     int desconectado = digitalRead(naoConectadoLedVermelho);
     int aguardando = digitalRead(conectandoLedAmarelo);
     int conectado = digitalRead(conectadoLedVerde);
@@ -260,8 +256,8 @@ void loop() {
       ubidots.add(VARIABLE_LABEL4, distancCm);  // Insert your variable Labels and the value to be sent
       ubidots.publish(DEVICE_LABEL);
 
-      ubidots.add(VARIABLE_LABEL5, testando123);  // Insert your variable Labels and the value to be sent
-      ubidots.publish(DEVICE_LABEL);
+      // ubidots.add(VARIABLE_LABEL5, testando123);  // Insert your variable Labels and the value to be sent
+      // ubidots.publish(DEVICE_LABEL);
       
       // ubidots.add(VARIABLE_LABEL5, testando123);  // Insert your variable Labels and the value to be sent
       // ubidots.publish(DEVICE_LABEL);
@@ -270,4 +266,11 @@ void loop() {
     timer = millis();
     ubidots.loop();
   }
+  delay(2000);
+  //Chama a função verificaCliente.
+  verificaCliente();
+  //Chama a função mensagemCliente.
+  mensagemClient();
+  //Liga o Led amarelo
+  digitalWrite(conectandoLedAmarelo, HIGH);
 }
