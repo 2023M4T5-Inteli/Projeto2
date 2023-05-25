@@ -44,7 +44,7 @@ void serverConect(){
   }
 }
 
-void returnMac(){
+String returnMac(){
   String bssidStr = WiFi.BSSIDstr(); //pega a string do endereço mac
 
   //Salva o endereço MAC na varial mensagem
@@ -58,6 +58,7 @@ void returnMac(){
   // Envia o Endereço MAC para o servidor
   client.println(mensagem);
   Serial.println(mensagem); // printa no Serial 
+  return mensagem;
 
 
   
@@ -75,7 +76,7 @@ void digitarMsn(){
   client.println(digita);
 }
 
-/*void identificaLocal(){
+void identificaLocal(String mensagem){
    // Verifica se a mensagem é um endereço MAC válido
     if (mensagem.length() == 12) {
       // Verifica se o endereço MAC já está na lista
@@ -123,7 +124,7 @@ void digitarMsn(){
     cont= 0;
 
 }
-*/
+
 
 void setup() {
   //define a porta do serial que mostrara as informarções
@@ -146,5 +147,11 @@ void loop() {
   // Verifica se há dados disponíveis no Serial
  
   returnMac();
+  Serial.println("irá entrar na funcao:");
+  delay(1000);
+
+
+  identificaLocal(returnMac());
+
   delay(3000);
 }
