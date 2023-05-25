@@ -51,12 +51,14 @@ void returnMac(){
 
   String mensagem = bssidStr; // acho q o erro ta aqui, o bssidStr não está atualizando quando eu uso o replace
 
+  mensagem.replace(":","");
   //Verifica se o outro dispositivo mandou mensagem.
   client.available();
 
   // Envia o Endereço MAC para o servidor
   client.println(mensagem);
   Serial.println(mensagem); // printa no Serial 
+
 
   
 
@@ -142,15 +144,7 @@ void loop() {
   Serial.println("Enviando Mensagem ao Server:");
 
   // Verifica se há dados disponíveis no Serial
-  if (Serial.available() > 0) {
-    // Lê a mensagem digitada
-    String mensagem = Serial.readStringUntil('\n');
-
-    // Envia a mensagem para o servidor
-    client.println(mensagem);
-    Serial.println(mensagem);
-    
-    delay(2000);
-    returnMac();
-  }
+ 
+  returnMac();
+  delay(3000);
 }
