@@ -65,16 +65,6 @@ String returnMac(){
 
 }
 
-void digitarMsn(){
-  Serial.println("digite uma mensagem:");
-  while(Serial.available() == 0){
-
-  }
-
-  String digita = Serial.readStringUntil('\n');
-
-  client.println(digita);
-}
 
 void identificaLocal(String mensagem){
    // Verifica se a mensagem é um endereço MAC válido
@@ -147,7 +137,7 @@ void loop() {
   // Verifica se há dados disponíveis no Serial
  
   returnMac();
-  Serial.println("irá entrar na funcao:");
+  
   delay(1000);
 
 
