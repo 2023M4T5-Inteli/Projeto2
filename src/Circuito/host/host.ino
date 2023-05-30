@@ -4,6 +4,8 @@
 #include <LiquidCrystal_I2C.h>
 #include "UbidotsEsp32Mqtt.h"
 
+//--------------------------------------------------------------------------//
+
 // Define o endereço do display LCD (verificar com o datasheet do módulo I2C)
 #define LCD_ADDRESS 0x27
 
@@ -15,8 +17,12 @@
 #define velocidade_som 0.034
 #define polegadas 0.40
 
+//--------------------------------------------------------------------------//
+
 // Cria um objeto LiquidCrystal_I2C para controlar o display LCD
 LiquidCrystal_I2C lcd(LCD_ADDRESS, LCD_COLUMNS, LCD_ROWS);
+
+//--------------------------------------------------------------------------//
 
 //Definindo vaiaveis para o sistema de quebra do ESP
 long duracao;
@@ -26,12 +32,16 @@ const int pinoBuzzer = 25;
 const int pinoTrig = 26;
 const int pinoEcho = 27;
 
+//--------------------------------------------------------------------------//
+
 //Outras variaveis
 int mac_adress;
 
 //Nome e Senha da rede WIFI
 const char *ssid = "Inteli-COLLEGE";
 const char *password = "QazWsx@123";
+
+//--------------------------------------------------------------------------//
 
 //Contantes para comunicacao com Ubidots
 const char *UBIDOTS_TOKEN = "BBFF-YjSV5EL4gwTUk2dbqC0Fuc97Y0zgm9";  // Put here your Ubidots TOKEN
@@ -43,11 +53,34 @@ const char *VARIABLE_LABEL4 = "status_estado_ESP";                  // Put here 
 const char *VARIABLE_LABEL5 = "MAC_ADRESS";                         // Put here your Variable label to which data  will be published
 const char *VARIABLE_LABEL6 = "potencia";                           // Put here your Variable label to which data  will be published
 
+//--------------------------------------------------------------------------//
+
 const int PUBLISH_FREQUENCY = 5000;  // Update rate in milliseconds
 
 unsigned long timer;
 
 Ubidots ubidots(UBIDOTS_TOKEN);
+
+//Inicia Server na porta 80
+WiFiServer server(3002);
+
+//Cria uma variavel client
+WiFiClient client;
+
+String mac;
+String lugar;
+String potencia;
+
+//--------------------------------------------------------------------------//
+
+//dado nome aos LEDS
+const int naoConectadoLedVermelho = 15;
+const int conectadoLedVerde = 0;
+const int conectandoLedAmarelo = 2;
+
+int i;
+
+//--------------------------------------------------------------------------//
 
 void callback(char *topic, byte *payload, unsigned int length) {
   Serial.print("Message arrived [");
@@ -59,22 +92,7 @@ void callback(char *topic, byte *payload, unsigned int length) {
   Serial.println();
 }
 
-//Inicia Server na porta 80
-WiFiServer server(3002);
-
-//Cria uma variavel client
-WiFiClient client;
-
-//Lista de endereços MAC
-String salas[5] = { "FC:5C:45:00:4F:C8", "FC:5C:45:00:4D:88", "FC:5C:45:00:60:98", "FC:5C:45:00:5C:F8", "FC:5C:45:00:57:08" };
-String lista[20] = {};
-
-//dado nome aos LEDS
-const int naoConectadoLedVermelho = 15;
-const int conectadoLedVerde = 0;
-const int conectandoLedAmarelo = 2;
-
-int i;
+//--------------------------------------------------------------------------//
 
 void LCD() {
   // Inicializa a comunicação I2C com o display LCD
@@ -84,6 +102,8 @@ void LCD() {
   // Liga o backlight do display LCD
   lcd.backlight();
 }
+
+//--------------------------------------------------------------------------//
 
 // void quebrou() {
 //   digitalWrite(pinoTrig, LOW);
@@ -107,6 +127,8 @@ void LCD() {
 //   delay(1000);
 // }
 
+//--------------------------------------------------------------------------//
+
 void connectWifi() {
   //Se o ESP32 não conectou no WIFI ele entra no loop e gera a mensagem de "Conectando ao WiFi..."
   while (WiFi.status() != WL_CONNECTED) {
@@ -116,6 +138,8 @@ void connectWifi() {
   }
 }
 
+//--------------------------------------------------------------------------//
+
 void infoNet() {
   //Quando o ESP32 se conecta no WIFI ele retorna no Serial que está conectado a rede e o IpLocal.
   Serial.println("Conectado ao WiFi!");
@@ -124,11 +148,15 @@ void infoNet() {
   Serial.println(WiFi.localIP());
 }
 
+//--------------------------------------------------------------------------//
+
 void iniciaServer() {
   //inicia o server na porta 80
   server.begin();
   Serial.println("Servidor iniciado na porta 3002.");
 }
+
+//--------------------------------------------------------------------------//
 
 void verificaCliente() {
   // Aguarda conexão de um cliente (outro ESP32) e enquanto não conecta ele pisca o led amarelo na protoboard
@@ -138,30 +166,29 @@ void verificaCliente() {
     delay(1000);
     digitalWrite(conectandoLedAmarelo, LOW);
     delay(1000);
-    Serial.println("Esp Foi de Base");
+    Serial.println("Cliente ainda não conectado");
 
     return;
   }
 }
 
-void roubo(){
-  if(!client.connected() && (!client.available())){
-    Serial.println("roubo");
-    client.stop(); // Encerra a conexão com o cliente
-    return;
-  }
-}
+//--------------------------------------------------------------------------//
+
 
 void mensagemClient() {
   //Verifica se o client(ESP32) mandou alguma mensagem.
+  
+  // Inicializa o LCD
+  lcd.begin(16, 2);
+
+
   if (client.available()) {
 
     // Lê a mensagem enviada pelo cliente
-    // Inicializa o LCD
-    lcd.begin(16, 2);
+    
 
 
-    String mac = client.readStringUntil('\n');
+    mac = client.readStringUntil('\n');
     lcd.setCursor(0, 0);
     lcd.print(mac);
     Serial.print("mac: ");
@@ -169,22 +196,33 @@ void mensagemClient() {
 
     delay(5000);
 
-    String lugar = client.readStringUntil('\n');
+    lugar = client.readStringUntil('\n');
     lcd.setCursor(0, 1);
     lcd.print(lugar);
     Serial.print("lugar: ");
     Serial.println(lugar);
     delay(5000);
 
-    String potencia = client.readStringUntil('\n');
+    potencia = client.readStringUntil('\n');
     lcd.setCursor(0, 0);
     lcd.print(potencia);
     Serial.print("potencia: ");
     Serial.println(potencia);
 
     delay(5000);
+  }else if(!client.available()){
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Roubado");
+    lcd.setCursor(0, 1);
+    lcd.print(lugar);
+
+    Serial.println("Roubado");
+    delay(3000);
   }
 }
+
+//--------------------------------------------------------------------------//
 
 void alertaConexao(int led, char *message) {
   while (true) {
@@ -195,6 +233,8 @@ void alertaConexao(int led, char *message) {
     delay(300);
   }
 }
+
+//--------------------------------------------------------------------------//
 
 void setup() {
   //Porta de saida para as informações(Porta Serial)
@@ -246,13 +286,12 @@ void loop() {
   // put your main code here, to run repeatedly:
   verificaCliente();
   if (!ubidots.connected()) {
-    roubo();
+
     ubidots.reconnect();
   }
-    verificaCliente();
+ 
   if (abs(millis() - timer) > PUBLISH_FREQUENCY)  // triggers the routine every 5 seconds
   {
-    roubo();
     int desconectado = digitalRead(naoConectadoLedVermelho);
     int aguardando = digitalRead(conectandoLedAmarelo);
     int conectado = digitalRead(conectadoLedVerde);
@@ -285,7 +324,11 @@ void loop() {
   digitalWrite(conectadoLedVerde, HIGH);
 
   //Chama a função verificaCliente.
-  roubo();
   //Chama a função mensagemCliente.
   mensagemClient();
+
+
+
+
+ 
 }

@@ -1,22 +1,28 @@
 #include <WiFi.h>
 #include <WiFiClient.h>
 
+//----------------------------------------------------------------//
+
 #define velocidade_som 0.034
 #define polegadas 0.40
+
+//----------------------------------------------------------------//
 
 const char* ssid = "Inteli-COLLEGE";
 const char* password = "QazWsx@123";
 const char* serverAddress = "10.128.71.32";  // Endereço IP local do servidor
 int serverPort = 3002;                        // Porta usada pelo servidor
 WiFiClient client;
-int cont = 0;
+
+//-------------------------------------------------------------------//
 
 // Número máximo de endereços MAC que podem ser armazenados
 const int MAX_MACS = 5;
-
 String macs[MAX_MACS];
-
 int numMacs = 0;
+int cont = 0;
+
+//-------------------------------------------------------------------//
 
 //Definindo vaiaveis para o sistema de quebra do ESP
 long duracao;
@@ -25,8 +31,9 @@ float distanciaInch;
 const int pinoBuzzer = 25;
 const int pinoTrig = 26;
 const int pinoEcho = 27;
-
 float potencia;
+
+//-------------------------------------------------------------------//
 
 void wifiWait() {
   //Entra num loop se o dispositivo (ESP32) não conecta a rede.
@@ -35,6 +42,8 @@ void wifiWait() {
     delay(1000);
   }
 }
+
+//-------------------------------------------------------------------//
 
 void infoRede() {
   //Retorna no Serial que o disponitivo esta conectado e o Indereço IP Local
@@ -53,6 +62,8 @@ void infoRede() {
   Serial.println(potencia);
 }
 
+//-------------------------------------------------------------------//
+
 void serverConect() {
   // Se o client não conecta no ip e na porta ele entra num loop que volta no Serial a mensagem : "Falha na conexão com o server."
   while (!client.connect(serverAddress, serverPort)) {
@@ -60,6 +71,8 @@ void serverConect() {
     delay(1000);
   }
 }
+
+//-------------------------------------------------------------------//
 
 String returnMac() {
   String bssidStr = WiFi.BSSIDstr();  //pega a string do endereço mac
@@ -78,6 +91,7 @@ String returnMac() {
   return mensagem;
 }
 
+//-------------------------------------------------------------------//
 
 void identificaLocal(String mensagem) {
   // Verifica se a mensagem é um endereço MAC válido
@@ -131,6 +145,9 @@ void identificaLocal(String mensagem) {
   cont = 0;
 }
 
+//-------------------------------------------------------------------//
+
+
 // void quebrou() {
 //   digitalWrite(pinoTrig, LOW);
 //   delayMicroseconds(2);
@@ -152,6 +169,8 @@ void identificaLocal(String mensagem) {
 //   Serial.println(distanciaInch);
 //   delay(1000);
 // }
+
+//-------------------------------------------------------------------//
 
 void setup() {
   //define a porta do serial que mostrara as informarções
@@ -178,14 +197,17 @@ void loop() {
 
   // Verifica se há dados disponíveis no Serial
   returnMac();
+
+  //Delay de 10s
   delay(10000);
 
-  
-
-
+  //chama a função identificaLocal() e passa como parametro a string de retorno da função returnMac()
   identificaLocal(returnMac());
+
+  //Delay de 10s
   delay(10000);
 
+  //Passa a potencia do Wifi para o host
   client.println(potencia);
   Serial.println(potencia);
   delay(10000);
