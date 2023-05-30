@@ -6,7 +6,7 @@
 
 const char* ssid = "Inteli-COLLEGE";
 const char* password = "QazWsx@123";
-const char* serverAddress = "10.128.71.252";  // Endereço IP local do servidor
+const char* serverAddress = "10.128.71.32";  // Endereço IP local do servidor
 int serverPort = 3002;                        // Porta usada pelo servidor
 WiFiClient client;
 int cont = 0;
@@ -75,20 +75,9 @@ String returnMac() {
   // Envia o Endereço MAC e a potencia do sinal para o servidor
   client.println(mensagem);
   Serial.println(mensagem);  // printa no Serial
-  client.println(potencia);
-  Serial.println(potencia);
   return mensagem;
 }
 
-void digitarMsn() {
-  Serial.println("digite uma mensagem:");
-  while (Serial.available() == 0) {
-  }
-
-  String digita = Serial.readStringUntil('\n');
-
-  client.println(digita);
-}
 
 void identificaLocal(String mensagem) {
   // Verifica se a mensagem é um endereço MAC válido
@@ -122,48 +111,52 @@ void identificaLocal(String mensagem) {
 
   if (mensagem == macs[cont]) {
     Serial.println("marcos ta no 1");
+    client.println("marcos ta no 1");
   }
   cont++;
   if (mensagem == macs[cont]) {
     Serial.println("marcos ta no 2");
+    client.println("marcos ta no 2");
   }
   cont++;
   if (mensagem == macs[cont]) {
     Serial.println("marcos ta no 3");
+    client.println("marcos ta no 3");
   }
   cont++;
   if (mensagem == macs[cont]) {
     Serial.println("marcos ta no 4");
+    client.println("marcos ta no 4");
   }
   cont = 0;
 }
 
-void quebrou() {
-  digitalWrite(pinoTrig, LOW);
-  delayMicroseconds(2);
-  digitalWrite(pinoTrig, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(pinoTrig, LOW);
-  duracao = pulseIn(pinoEcho, HIGH);         // Calcule a distância
-  distancCm = duracao * velocidade_som / 2;  // Converter para centimetros
-  distanciaInch = distancCm * polegadas;     // Converter para polegadas
-  if (distancCm > 7) {
-    digitalWrite(pinoBuzzer, HIGH);
-    Serial.print("ESP32 retirado do dispositivo!!!");
-    delay(2000);
-    digitalWrite(pinoBuzzer, LOW);
-  }
-  Serial.print("Distancia (cm): ");  // Imprime a distância no Serial Monitor
-  Serial.println(distancCm);
-  Serial.print("Distancia (inch): ");
-  Serial.println(distanciaInch);
-  delay(1000);
-}
+// void quebrou() {
+//   digitalWrite(pinoTrig, LOW);
+//   delayMicroseconds(2);
+//   digitalWrite(pinoTrig, HIGH);
+//   delayMicroseconds(10);
+//   digitalWrite(pinoTrig, LOW);
+//   duracao = pulseIn(pinoEcho, HIGH);         // Calcule a distância
+//   distancCm = duracao * velocidade_som / 2;  // Converter para centimetros
+//   distanciaInch = distancCm * polegadas;     // Converter para polegadas
+//   if (distancCm > 7) {
+//     digitalWrite(pinoBuzzer, HIGH);
+//     Serial.print("ESP32 retirado do dispositivo!!!");
+//     delay(2000);
+//     digitalWrite(pinoBuzzer, LOW);
+//   }
+//   Serial.print("Distancia (cm): ");  // Imprime a distância no Serial Monitor
+//   Serial.println(distancCm);
+//   Serial.print("Distancia (inch): ");
+//   Serial.println(distanciaInch);
+//   delay(1000);
+// }
 
 void setup() {
   //define a porta do serial que mostrara as informarções
   Serial.begin(9600);
-  quebrou();
+  // quebrou();
 
   WiFi.begin(ssid, password);
   //Chama a função wifiWait
@@ -178,20 +171,23 @@ void setup() {
 void loop() {
 
   //Funcao para envio de notificacao caso o ESP seja danificado
-  quebrou();
-
+//  quebrou();
+ 
   //Mostra no serial que está enviando a mensagem para o servidor.
   Serial.println("Enviando Mensagem ao Server:");
 
   // Verifica se há dados disponíveis no Serial
   returnMac();
+  delay(10000);
 
   
 
-  Serial.println("irá entrar na funcao:");
-  delay(1000);
 
   identificaLocal(returnMac());
+  delay(10000);
 
-  delay(3000);
+  client.println(potencia);
+  Serial.println(potencia);
+  delay(10000);
+
 }
