@@ -45,7 +45,7 @@ const char *password = "QazWsx@123";
 
 //Contantes para comunicacao com Ubidots
 const char *UBIDOTS_TOKEN = "BBFF-UXLQPo0lxDPXTuR1TE0f8gTIkUDJti";  // Put here your Ubidots TOKEN
-const char *DEVICE_LABEL = "Kakinho";                                  // Put here your Device label to which data  will be published
+const char *DEVICE_LABEL = "Kakinho";                               // Put here your Device label to which data  will be published
 const char *VARIABLE_LABEL = "desconectado";                        // Put here your Variable label to which data  will be published
 const char *VARIABLE_LABEL2 = "aguardando";                         // Put here your Variable label to which data  will be published
 const char *VARIABLE_LABEL3 = "conectado";                          // Put here your Variable label to which data  will be published
@@ -175,6 +175,22 @@ void verificaCliente() {
 //--------------------------------------------------------------------------//
 
 
+String macToDecimal(const String &mac) {
+  String decimalAddress = "";
+
+  for (int i = 0; i < mac.length(); i += 3) {
+    String hexByte = mac.substring(i, i + 2);
+    unsigned int decimalByte = strtol(hexByte.c_str(), NULL, 16);
+    decimalAddress += String(decimalByte) + ".";
+  }
+
+  decimalAddress.remove(decimalAddress.length() - 1);  // Remove o último ponto
+
+  return decimalAddress;
+}
+
+//--------------------------------------------------------------------------//
+
 void mensagemClient() {
   //Verifica se o client(ESP32) mandou alguma mensagem.
 
@@ -193,6 +209,11 @@ void mensagemClient() {
     lcd.print(mac);
     Serial.print("mac: ");
     Serial.println(mac);
+    String newMac = macToDecimal(mac);
+    newMac.replace(".", "");
+
+    Serial.print("Endereço MAC em decimal: ");
+    Serial.println(newMac);
 
     delay(5000);
 
@@ -235,6 +256,7 @@ void alertaConexao(int led, char *message) {
 }
 
 //--------------------------------------------------------------------------//
+
 
 void setup() {
   //Porta de saida para as informações(Porta Serial)
@@ -283,6 +305,8 @@ void setup() {
 
 
 void loop() {
+
+
   // put your main code here, to run repeatedly:
   verificaCliente();
 
@@ -310,7 +334,7 @@ void loop() {
     ubidots.add(VARIABLE_LABEL4, distancCm);  // Insert your variable Labels and the value to be sent
     ubidots.publish(DEVICE_LABEL);
 
-    
+
     float smValue = 1011;
 
 
