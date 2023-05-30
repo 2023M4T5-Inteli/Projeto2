@@ -10,6 +10,8 @@
 // Define o número de colunas e linhas do display LCD
 #define LCD_COLUMNS 21
 #define LCD_ROWS 22
+
+//Define variaveis para a funcao do sensor ultrasonico
 #define velocidade_som 0.034
 #define polegadas 0.40
 
@@ -23,6 +25,8 @@ float distanciaInch;
 const int pinoBuzzer = 25;
 const int pinoTrig = 26;
 const int pinoEcho = 27;
+
+//Outras variaveis
 int mac_adress;
 
 //Nome e Senha da rede WIFI
@@ -37,7 +41,7 @@ const char *VARIABLE_LABEL2 = "aguardando";                         // Put here 
 const char *VARIABLE_LABEL3 = "conectado";                          // Put here your Variable label to which data  will be published
 const char *VARIABLE_LABEL4 = "status_estado_ESP";                  // Put here your Variable label to which data  will be published
 const char *VARIABLE_LABEL5 = "MAC_ADRESS";                         // Put here your Variable label to which data  will be published
-const char *VARIABLE_LABEL6 = "qtd_desconectado";                   // Put here your Variable label to which data  will be published
+const char *VARIABLE_LABEL6 = "potencia";                           // Put here your Variable label to which data  will be published
 
 const int PUBLISH_FREQUENCY = 5000;  // Update rate in milliseconds
 
@@ -81,27 +85,27 @@ void LCD() {
   lcd.backlight();
 }
 
-void quebrou() {
-  digitalWrite(pinoTrig, LOW);
-  delayMicroseconds(2);
-  digitalWrite(pinoTrig, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(pinoTrig, LOW);
-  duracao = pulseIn(pinoEcho, HIGH);         // Calcule a distância
-  distancCm = duracao * velocidade_som / 2;  // Converter para centimetros
-  distanciaInch = distancCm * polegadas;     // Converter para polegadas
-  if (distancCm > 7) {
-    digitalWrite(pinoBuzzer, HIGH);
-    Serial.print("ESP32 retirado do dispositivo!!!");
-    delay(2000);
-    digitalWrite(pinoBuzzer, LOW);
-  }
-  Serial.print("Distancia (cm): ");  // Imprime a distância no Serial Monitor
-  Serial.println(distancCm);
-  Serial.print("Distancia (inch): ");
-  Serial.println(distanciaInch);
-  delay(1000);
-}
+// void quebrou() {
+//   digitalWrite(pinoTrig, LOW);
+//   delayMicroseconds(2);
+//   digitalWrite(pinoTrig, HIGH);
+//   delayMicroseconds(10);
+//   digitalWrite(pinoTrig, LOW);
+//   duracao = pulseIn(pinoEcho, HIGH);         // Calcule a distância
+//   distancCm = duracao * velocidade_som / 2;  // Converter para centimetros
+//   distanciaInch = distancCm * polegadas;     // Converter para polegadas
+//   if (distancCm > 7) {
+//     digitalWrite(pinoBuzzer, HIGH);
+//     Serial.print("ESP32 retirado do dispositivo!!!");
+//     delay(2000);
+//     digitalWrite(pinoBuzzer, LOW);
+//   }
+//   Serial.print("Distancia (cm): ");  // Imprime a distância no Serial Monitor
+//   Serial.println(distancCm);
+//   Serial.print("Distancia (inch): ");
+//   Serial.println(distanciaInch);
+//   delay(1000);
+// }
 
 void connectWifi() {
   //Se o ESP32 não conectou no WIFI ele entra no loop e gera a mensagem de "Conectando ao WiFi..."
@@ -134,7 +138,16 @@ void verificaCliente() {
     delay(1000);
     digitalWrite(conectandoLedAmarelo, LOW);
     delay(1000);
+    Serial.println("Esp Foi de Base");
 
+    return;
+  }
+}
+
+void roubo(){
+  if(!client.connected() && (!client.available())){
+    Serial.println("roubo");
+    client.stop(); // Encerra a conexão com o cliente
     return;
   }
 }
@@ -144,128 +157,135 @@ void mensagemClient() {
   if (client.available()) {
 
     // Lê a mensagem enviada pelo cliente
-    String mensagem = client.readStringUntil('\n');
+    // Inicializa o LCD
+    lcd.begin(16, 2);
 
-    //retorna uma nova string sem os espaços em branco.
-    mensagem.trim();
 
-    // Imprime a mensagem recebida do client.
-    Serial.print("Mensagem recebida: ");
-    Serial.println(mensagem);
+    String mac = client.readStringUntil('\n');
+    lcd.setCursor(0, 0);
+    lcd.print(mac);
+    Serial.print("mac: ");
+    Serial.println(mac);
 
-    if (mensagem == "FC5C45005748") {
-      String mac_adress = mensagem;
-      lcd.setCursor(0, 0);
-      lcd.print("Primeiro andar");
-      // }else{
+    delay(5000);
 
-      //   float potencia = mensagem::stof(str);
-      //   lcd.setCursor(0, 0);
-      //   lcd.print("Potencia do sinal:");
-      //   lcd.setCursor(0, 1);
-      //   lcd.print(potencia);
-      //   delay(5000);
-      // }
-    }
+    String lugar = client.readStringUntil('\n');
+    lcd.setCursor(0, 1);
+    lcd.print(lugar);
+    Serial.print("lugar: ");
+    Serial.println(lugar);
+    delay(5000);
+
+    String potencia = client.readStringUntil('\n');
+    lcd.setCursor(0, 0);
+    lcd.print(potencia);
+    Serial.print("potencia: ");
+    Serial.println(potencia);
+
+    delay(5000);
   }
 }
 
-  void alertaConexao(int led, char *message) {
-    while (true) {
-      Serial.println(message);
-      digitalWrite(led, HIGH);
-      delay(300);
-      digitalWrite(led, LOW);
-      delay(300);
-    }
+void alertaConexao(int led, char *message) {
+  while (true) {
+    Serial.println(message);
+    digitalWrite(led, HIGH);
+    delay(300);
+    digitalWrite(led, LOW);
+    delay(300);
   }
+}
 
-  void setup() {
-    //Porta de saida para as informações(Porta Serial)
-    Serial.begin(9600);
+void setup() {
+  //Porta de saida para as informações(Porta Serial)
+  Serial.begin(9600);
 
-    // estabelecendo conexao com o broker ubidots
-    ubidots.connectToWifi(ssid, password);
-    ubidots.setCallback(callback);
-    ubidots.setup();
+  // estabelecendo conexao com o broker ubidots
+  ubidots.connectToWifi(ssid, password);
+  ubidots.setCallback(callback);
+  ubidots.setup();
+  ubidots.reconnect();
+
+  timer = millis();
+
+  //Define os pinos de saida do Buzzer e do Trig
+  pinMode(pinoTrig, OUTPUT);
+  pinMode(pinoBuzzer, OUTPUT);
+  //Define o pino de entrada do Som
+  pinMode(pinoEcho, INPUT);
+
+  //definição dos LEDS
+  pinMode(naoConectadoLedVermelho, OUTPUT);
+  pinMode(conectandoLedAmarelo, OUTPUT);
+  pinMode(conectadoLedVerde, OUTPUT);
+
+  //Chama a função quebrou.
+  // quebrou();
+
+  //Conecta com o Wifi pegando o Nome e a Senha da rede
+  WiFi.begin(ssid, password);
+
+  //Chama a função connectWifi.
+  connectWifi();
+
+  //Desliga o Led vermelho assim que conecta ao Wifi
+  digitalWrite(naoConectadoLedVermelho, LOW);
+
+  //Chama a função infoNet.
+  infoNet();
+
+  //Chama a função iniciaServer.
+  iniciaServer();
+
+  //Chama a função LCD
+  LCD();
+}
+
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  verificaCliente();
+  if (!ubidots.connected()) {
+    roubo();
     ubidots.reconnect();
+  }
+    verificaCliente();
+  if (abs(millis() - timer) > PUBLISH_FREQUENCY)  // triggers the routine every 5 seconds
+  {
+    roubo();
+    int desconectado = digitalRead(naoConectadoLedVermelho);
+    int aguardando = digitalRead(conectandoLedAmarelo);
+    int conectado = digitalRead(conectadoLedVerde);
+
+
+    ubidots.add(VARIABLE_LABEL, desconectado);  // Insert your variable Labels and the value to be sent
+    ubidots.publish(DEVICE_LABEL);
+
+    ubidots.add(VARIABLE_LABEL2, aguardando);  // Insert your variable Labels and the value to be sent
+    ubidots.publish(DEVICE_LABEL);
+
+    ubidots.add(VARIABLE_LABEL3, conectado);  // Insert your variable Labels and the value to be sent
+    ubidots.publish(DEVICE_LABEL);
+
+    ubidots.add(VARIABLE_LABEL4, distancCm);  // Insert your variable Labels and the value to be sent
+    ubidots.publish(DEVICE_LABEL);
+
+    ubidots.add(VARIABLE_LABEL5, mac_adress);  // Insert your variable Labels and the value to be sent
+    ubidots.publish(DEVICE_LABEL);
+
+    // ubidots.add(VARIABLE_LABEL6, potenciaInt);  // Insert your variable Labels and the value to be sent
+    // ubidots.publish(DEVICE_LABEL);
 
     timer = millis();
-
-    //Define os pinos de saida do Buzzer e do Trig
-    pinMode(pinoTrig, OUTPUT);
-    pinMode(pinoBuzzer, OUTPUT);
-    //Define o pino de entrada do Som
-    pinMode(pinoEcho, INPUT);
-
-    //definição dos LEDS
-    pinMode(naoConectadoLedVermelho, OUTPUT);
-    pinMode(conectandoLedAmarelo, OUTPUT);
-    pinMode(conectadoLedVerde, OUTPUT);
-
-    //Chama a função quebrou.
-    quebrou();
-
-    //Conecta com o Wifi pegando o Nome e a Senha da rede
-    WiFi.begin(ssid, password);
-
-    //Chama a função connectWifi.
-    connectWifi();
-
-    //Desliga o Led vermelho assim que conecta ao Wifi
-    digitalWrite(naoConectadoLedVermelho, LOW);
-
-    //Chama a função infoNet.
-    infoNet();
-
-    //Chama a função iniciaServer.
-    iniciaServer();
-
-    //Chama a função LCD
-    LCD();
+    ubidots.loop();
   }
+  //Chama a função quebrou.
+  // quebrou();
+  //Liga o Led Verde
+  digitalWrite(conectadoLedVerde, HIGH);
 
-
-  void loop() {
-    //Chama a função quebrou.
-    quebrou();
-    //Liga o Led Verde
-    digitalWrite(conectadoLedVerde, HIGH);
-
-    //Chama a função verificaCliente.
-    verificaCliente();
-    //Chama a função mensagemCliente.
-    mensagemClient();
-
-    lcd.clear();
-
-    // put your main code here, to run repeatedly:
-    if (!ubidots.connected()) {
-      ubidots.reconnect();
-    }
-    if (abs(millis() - timer) > PUBLISH_FREQUENCY)  // triggers the routine every 5 seconds
-    {
-      int desconectado = digitalRead(naoConectadoLedVermelho);
-      int aguardando = digitalRead(conectandoLedAmarelo);
-      int conectado = digitalRead(conectadoLedVerde);
-
-      ubidots.add(VARIABLE_LABEL, desconectado);  // Insert your variable Labels and the value to be sent
-      ubidots.publish(DEVICE_LABEL);
-
-      ubidots.add(VARIABLE_LABEL2, aguardando);  // Insert your variable Labels and the value to be sent
-      ubidots.publish(DEVICE_LABEL);
-
-      ubidots.add(VARIABLE_LABEL3, conectado);  // Insert your variable Labels and the value to be sent
-      ubidots.publish(DEVICE_LABEL);
-
-      ubidots.add(VARIABLE_LABEL4, distancCm);  // Insert your variable Labels and the value to be sent
-      ubidots.publish(DEVICE_LABEL);
-
-      ubidots.add(VARIABLE_LABEL5, mac_adress);  // Insert your variable Labels and the value to be sent
-      ubidots.publish(DEVICE_LABEL);
-
-      timer = millis();
-      ubidots.loop();
-    }
-    delay(2000);
-  }
+  //Chama a função verificaCliente.
+  roubo();
+  //Chama a função mensagemCliente.
+  mensagemClient();
+}
