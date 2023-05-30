@@ -88,6 +88,7 @@ String returnMac() {
   // Envia o Endereço MAC e a potencia do sinal para o servidor
   client.println(mensagem);
   Serial.println(mensagem);  // printa no Serial
+  delay(5000);
   return mensagem;
 }
 
