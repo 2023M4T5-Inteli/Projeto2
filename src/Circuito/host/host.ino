@@ -44,8 +44,8 @@ const char *password = "QazWsx@123";
 //--------------------------------------------------------------------------//
 
 //Contantes para comunicacao com Ubidots
-const char *UBIDOTS_TOKEN = "BBFF-YjSV5EL4gwTUk2dbqC0Fuc97Y0zgm9";  // Put here your Ubidots TOKEN
-const char *DEVICE_LABEL = "KLIF";                                  // Put here your Device label to which data  will be published
+const char *UBIDOTS_TOKEN = "BBFF-UXLQPo0lxDPXTuR1TE0f8gTIkUDJti";  // Put here your Ubidots TOKEN
+const char *DEVICE_LABEL = "Kakinho";                                  // Put here your Device label to which data  will be published
 const char *VARIABLE_LABEL = "desconectado";                        // Put here your Variable label to which data  will be published
 const char *VARIABLE_LABEL2 = "aguardando";                         // Put here your Variable label to which data  will be published
 const char *VARIABLE_LABEL3 = "conectado";                          // Put here your Variable label to which data  will be published
@@ -177,7 +177,7 @@ void verificaCliente() {
 
 void mensagemClient() {
   //Verifica se o client(ESP32) mandou alguma mensagem.
-  
+
   // Inicializa o LCD
   lcd.begin(16, 2);
 
@@ -185,7 +185,7 @@ void mensagemClient() {
   if (client.available()) {
 
     // Lê a mensagem enviada pelo cliente
-    
+
 
 
     mac = client.readStringUntil('\n');
@@ -210,7 +210,7 @@ void mensagemClient() {
     Serial.println(potencia);
 
     delay(5000);
-  }else if(!client.available()){
+  } else if (!client.available()) {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Roubado");
@@ -285,11 +285,12 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   verificaCliente();
+
   if (!ubidots.connected()) {
 
     ubidots.reconnect();
   }
- 
+
   if (abs(millis() - timer) > PUBLISH_FREQUENCY)  // triggers the routine every 5 seconds
   {
     int desconectado = digitalRead(naoConectadoLedVermelho);
@@ -309,8 +310,14 @@ void loop() {
     ubidots.add(VARIABLE_LABEL4, distancCm);  // Insert your variable Labels and the value to be sent
     ubidots.publish(DEVICE_LABEL);
 
-    ubidots.add(VARIABLE_LABEL5, mac_adress);  // Insert your variable Labels and the value to be sent
+    
+    float smValue = 1011;
+
+
+
+    ubidots.add(VARIABLE_LABEL5, smValue);  // Insert your variable Labels and the value to be sent
     ubidots.publish(DEVICE_LABEL);
+
 
     // ubidots.add(VARIABLE_LABEL6, potenciaInt);  // Insert your variable Labels and the value to be sent
     // ubidots.publish(DEVICE_LABEL);
@@ -326,9 +333,4 @@ void loop() {
   //Chama a função verificaCliente.
   //Chama a função mensagemCliente.
   mensagemClient();
-
-
-
-
- 
 }
