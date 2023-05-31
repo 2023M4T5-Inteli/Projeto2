@@ -34,8 +34,19 @@ const int pinoEcho = 27;
 
 //--------------------------------------------------------------------------//
 
+int contadorDesconexao = 0;  // Variável para contabilizar desconexões
+bool estadoAnterior = true;
+
 //Outras variaveis
+int qtdDesconectado = 0;
+int separadorIndex = 0;
 int mac_adress;
+String mac;
+String lugar;
+String potencia = "";
+String mensagem = "";
+String clientMac = "";
+String newMac = "";
 
 //Nome e Senha da rede WIFI
 const char *ssid = "Inteli-COLLEGE";
@@ -45,17 +56,18 @@ const char *password = "QazWsx@123";
 
 //Contantes para comunicacao com Ubidots
 const char *UBIDOTS_TOKEN = "BBFF-YjSV5EL4gwTUk2dbqC0Fuc97Y0zgm9";  // Put here your Ubidots TOKEN
-const char *DEVICE_LABEL = "klif";                               // Put here your Device label to which data  will be published
+const char *DEVICE_LABEL = "klif";                                  // Put here your Device label to which data  will be published
 const char *VARIABLE_LABEL = "desconectado";                        // Put here your Variable label to which data  will be published
 const char *VARIABLE_LABEL2 = "aguardando";                         // Put here your Variable label to which data  will be published
 const char *VARIABLE_LABEL3 = "conectado";                          // Put here your Variable label to which data  will be published
 const char *VARIABLE_LABEL4 = "status_estado_ESP";                  // Put here your Variable label to which data  will be published
-const char *VARIABLE_LABEL5 = "ID_SALA";                         // Put here your Variable label to which data  will be published
-const char *VARIABLE_LABEL6 = "potencia";                           // Put here your Variable label to which data  will be published
+const char *VARIABLE_LABEL5 = "ID_SALA";                            // Put here your Variable label to which data  will be published
+const char *VARIABLE_LABEL6 = "potencia";  
+const char *VARIABLE_LABEL7 = "Quantidade vezes desconectada";                          // Put here your Variable label to which data  will be published
 
 //--------------------------------------------------------------------------//
 
-const int PUBLISH_FREQUENCY = 5000;  // Update rate in milliseconds
+const int PUBLISH_FREQUENCY = 200;  // Update rate in milliseconds
 
 unsigned long timer;
 
@@ -66,15 +78,6 @@ WiFiServer server(3002);
 
 //Cria uma variavel client
 WiFiClient client;
-
-String mac;
-String lugar;
-String potencia = "";
-String mensagem = "";
-String clientMac = "";
-
-int separadorIndex = 0;
-String newMac = "";
 
 //--------------------------------------------------------------------------//
 
@@ -110,27 +113,27 @@ void LCD() {
 
 //--------------------------------------------------------------------------//
 
-// void quebrou() {
-//   digitalWrite(pinoTrig, LOW);
-//   delayMicroseconds(2);
-//   digitalWrite(pinoTrig, HIGH);
-//   delayMicroseconds(10);
-//   digitalWrite(pinoTrig, LOW);
-//   duracao = pulseIn(pinoEcho, HIGH);         // Calcule a distância
-//   distancCm = duracao * velocidade_som / 2;  // Converter para centimetros
-//   distanciaInch = distancCm * polegadas;     // Converter para polegadas
-//   if (distancCm > 7) {
-//     digitalWrite(pinoBuzzer, HIGH);
-//     Serial.print("ESP32 retirado do dispositivo!!!");
-//     delay(2000);
-//     digitalWrite(pinoBuzzer, LOW);
-//   }
-//   Serial.print("Distancia (cm): ");  // Imprime a distância no Serial Monitor
-//   Serial.println(distancCm);
-//   Serial.print("Distancia (inch): ");
-//   Serial.println(distanciaInch);
-//   delay(1000);
-// }
+void quebrou() {
+  digitalWrite(pinoTrig, LOW);
+  delayMicroseconds(2);
+  digitalWrite(pinoTrig, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(pinoTrig, LOW);
+  duracao = pulseIn(pinoEcho, HIGH);         // Calcule a distância
+  distancCm = duracao * velocidade_som / 2;  // Converter para centimetros
+  distanciaInch = distancCm * polegadas;     // Converter para polegadas
+  if (distancCm > 7) {
+    digitalWrite(pinoBuzzer, HIGH);
+    Serial.print("ESP32 retirado do dispositivo!!!");
+    delay(2000);
+    digitalWrite(pinoBuzzer, LOW);
+  }
+  // Serial.print("Distancia (cm): ");  // Imprime a distância no Serial Monitor
+  // Serial.println(distancCm);
+  // Serial.print("Distancia (inch): ");
+  // Serial.println(distanciaInch);
+  delay(1000);
+}
 
 //--------------------------------------------------------------------------//
 
@@ -175,23 +178,8 @@ void verificaCliente() {
 
     return;
   }
-}
-
-//--------------------------------------------------------------------------//
-
-
-String macToDecimal(const String &mac) {
-  String decimalAddress = "";
-
-  for (int i = 0; i < mac.length(); i += 3) {
-    String hexByte = mac.substring(i, i + 2);
-    unsigned int decimalByte = strtol(hexByte.c_str(), NULL, 16);
-    decimalAddress += String(decimalByte) + ".";
-  }
-
-  decimalAddress.remove(decimalAddress.length() - 1);  // Remove o último ponto
-
-  return decimalAddress;
+  digitalWrite(conectadoLedVerde, HIGH);
+  digitalWrite(naoConectadoLedVermelho, LOW);
 }
 
 //--------------------------------------------------------------------------//
@@ -202,44 +190,41 @@ void mensagemClient() {
   // Inicializa o LCD
   lcd.begin(16, 2);
 
-
   if (client.available()) {
-
+    Serial.print("Conectado");
+    estadoAnterior = true;
     // Lê a mensagem enviada pelo cliente
-
-
-
     mensagem = client.readStringUntil('\n');
-
-    
     separadorIndex = mensagem.indexOf("#");
 
     if (separadorIndex != -1) {
       clientMac = mensagem.substring(0, separadorIndex);
       potencia = mensagem.substring(separadorIndex + 1);
-      newMac=macToDecimal(clientMac);
-      newMac.replace(".","");
-
-      //Serial.println("agora o mac é: " + newMac + ", e a potencia: " + potencia);
     }
-
-    // lcd.setCursor(0, 0);
-    // lcd.print(mac);
-    // Serial.print("mac: ");
-    // Serial.println(mac);
-    // String newMac = macToDecimal(mac);
-    // newMac.replace(".", "");
-
-  } else if (!client.available()) {
+  } else if (!client.available() && estadoAnterior == true) {
+    estadoAnterior = false;
+    qtdDesconectado++;
+    digitalWrite(naoConectadoLedVermelho, HIGH);
     lcd.clear();
     lcd.setCursor(0, 0);
-    lcd.print("Roubado");
+    lcd.print("ESP Desconectado");
     lcd.setCursor(0, 1);
     lcd.print(lugar);
-
-    Serial.println("Roubado");
+    Serial.println("ESP Desconectado");
+    Serial.println(qtdDesconectado);
     delay(3000);
-  }
+  // } else if (client.available() && estadoAnterior = f) {
+  //     estadoAnterior = true;  // Atualiza o estado anterior para conectado
+  //     // conectado = true;
+  //     // Lê a mensagem enviada pelo cliente
+  //     mensagem = client.readStringUntil('\n');
+  //     separadorIndex = mensagem.indexOf("#");
+
+  //     if (separadorIndex != -1) {
+  //       clientMac = mensagem.substring(0, separadorIndex);
+  //       potencia = mensagem.substring(separadorIndex + 1);
+  //     }
+    }
 }
 
 //--------------------------------------------------------------------------//
@@ -255,7 +240,6 @@ void alertaConexao(int led, char *message) {
 }
 
 //--------------------------------------------------------------------------//
-
 
 void setup() {
   //Porta de saida para as informações(Porta Serial)
@@ -302,21 +286,20 @@ void setup() {
   LCD();
 }
 
-
 void loop() {
 
-
-  // put your main code here, to run repeatedly:
   verificaCliente();
 
   mensagemClient();
 
-  long id =newMac.toInt();
-  long dbm=potencia.toInt();
+  //Transformando variaveis em inteiro
+  long id = clientMac.toInt();
+  long dbm = 100 - potencia.toInt() * (-1);
 
-  Serial.println(id);
+  // Serial.println(dbm);
+  // Serial.println(id);
 
-  Serial.println("Passou do mensagemClient");
+  // Serial.println("Passou do mensagemClient");
 
   if (!ubidots.connected()) {
 
@@ -328,7 +311,6 @@ void loop() {
     int desconectado = digitalRead(naoConectadoLedVermelho);
     int aguardando = digitalRead(conectandoLedAmarelo);
     int conectado = digitalRead(conectadoLedVerde);
-
 
     ubidots.add(VARIABLE_LABEL, desconectado);  // Insert your variable Labels and the value to be sent
     ubidots.publish(DEVICE_LABEL);
@@ -348,20 +330,13 @@ void loop() {
     ubidots.add(VARIABLE_LABEL6, dbm);  // Insert your variable Labels and the value to be sent
     ubidots.publish(DEVICE_LABEL);
 
-
-    // ubidots.add(VARIABLE_LABEL6, potenciaInt);  // Insert your variable Labels and the value to be sent
-    // ubidots.publish(DEVICE_LABEL);
+    ubidots.add(VARIABLE_LABEL7, qtdDesconectado);  // Insert your variable Labels and the value to be sent
+    ubidots.publish(DEVICE_LABEL);
 
     timer = millis();
     ubidots.loop();
   }
+
   //Chama a função quebrou.
-  // quebrou();
-  //Liga o Led Verde
-  digitalWrite(conectadoLedVerde, HIGH);
-
-  //Chama a função verificaCliente.
-  //Chama a função mensagemCliente.
-
-
+  quebrou();
 }

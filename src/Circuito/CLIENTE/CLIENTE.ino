@@ -10,7 +10,7 @@
 
 const char* ssid = "Inteli-COLLEGE";
 const char* password = "QazWsx@123";
-const char* serverAddress = "10.128.71.196";  // Endereço IP local do servidor
+const char* serverAddress = "10.128.71.32";  // Endereço IP local do servidor
 int serverPort = 3002;                        // Porta usada pelo servidor
 WiFiClient client;
 
@@ -33,6 +33,7 @@ const int pinoBuzzer = 25;
 const int pinoTrig = 26;
 const int pinoEcho = 27;
 float potencia;
+String sala;
 
 //-------------------------------------------------------------------//
 
@@ -90,6 +91,18 @@ String returnMac() {
   return mensagem;
 }
 
+
+//-------------------------------------------------------------------//
+String fullmsn(String x) {
+  //chama a função identificaLocal() e passa como parametro a string de retorno da função returnMac()
+  // String mac = returnMac();
+  // Serial.println(mac);
+  Serial.println(potencia);
+  complete = x + "#" + potencia;
+  Serial.println(complete);
+  client.println(complete);
+  return complete;
+}
 //-------------------------------------------------------------------//
 
 void identificaLocal(String mensagem) {
@@ -124,39 +137,32 @@ void identificaLocal(String mensagem) {
 
   if (mensagem == macs[cont]) {
     Serial.println("marcos ta no 1");
-    //client.println("marcos ta no 1");
+    sala = fullmsn("1");
+    client.println(sala);
   }
   cont++;
   if (mensagem == macs[cont]) {
     Serial.println("marcos ta no 2");
-    //client.println("marcos ta no 2");
+    sala = fullmsn("2");
+    client.println(sala);
   }
   cont++;
   if (mensagem == macs[cont]) {
     Serial.println("marcos ta no 3");
-    //client.println("marcos ta no 3");
+    sala = fullmsn("3");
+    client.println(sala);
   }
   cont++;
   if (mensagem == macs[cont]) {
     Serial.println("marcos ta no 4");
-    //client.println("marcos ta no 4");
+    sala = fullmsn("4");
+    client.println(sala);
   }
   cont = 0;
 }
 
 //-------------------------------------------------------------------//
 
-void fullMsn(){
-  //chama a função identificaLocal() e passa como parametro a string de retorno da função returnMac()
-  String mac = returnMac();
-  Serial.println(mac);
-  Serial.println(potencia);
-  complete = mac+"#"+potencia;
-  Serial.println(complete);
-  client.println(complete);
-  
-
-}
 
 
 // void quebrou() {
@@ -201,18 +207,16 @@ void setup() {
 void loop() {
 
   //Funcao para envio de notificacao caso o ESP seja danificado
-//  quebrou();
- 
+  //  quebrou();
+
   //Mostra no serial que está enviando a mensagem para o servidor.
   Serial.println("Enviando Mensagem ao Server:");
 
   // Verifica se há dados disponíveis no Serial
   //returnMac()
-
-  fullMsn();
-
+  identificaLocal(returnMac());
+  // fullmsn();
+  Serial.print(sala);
   //Passa a potencia do Wifi para o host
   Serial.println(potencia);
-
-
 }
