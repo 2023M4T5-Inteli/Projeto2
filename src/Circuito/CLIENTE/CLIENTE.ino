@@ -10,7 +10,7 @@
 
 const char* ssid = "Inteli-COLLEGE";
 const char* password = "QazWsx@123";
-const char* serverAddress = "10.128.71.32";  // Endereço IP local do servidor
+const char* serverAddress = "10.128.71.196";  // Endereço IP local do servidor
 int serverPort = 3002;                        // Porta usada pelo servidor
 WiFiClient client;
 
@@ -21,7 +21,6 @@ const int MAX_MACS = 5;
 String macs[MAX_MACS];
 int numMacs = 0;
 int cont = 0;
-String mensagem;
 String complete;
 
 //-------------------------------------------------------------------//
@@ -80,7 +79,7 @@ String returnMac() {
   String bssidStr = WiFi.BSSIDstr();  //pega a string do endereço mac
 
   //Salva o endereço MAC na varial mensagem
-  mensagem = bssidStr;  // acho q o erro ta aqui, o bssidStr não está atualizando quando eu uso o replace
+  String mensagem = bssidStr;  // acho q o erro ta aqui, o bssidStr não está atualizando quando eu uso o replace
 
   mensagem.replace(":", "");
 
@@ -88,8 +87,6 @@ String returnMac() {
   client.available();
 
   // Envia o Endereço MAC e a potencia do sinal para o servidor
-  Serial.println(mensagem);  // printa no Serial
-  delay(5000);
   return mensagem;
 }
 
@@ -151,9 +148,10 @@ void identificaLocal(String mensagem) {
 
 void fullMsn(){
   //chama a função identificaLocal() e passa como parametro a string de retorno da função returnMac()
-  Serial.println(mensagem);
+  String mac = returnMac();
+  Serial.println(mac);
   Serial.println(potencia);
-  complete = mensagem+"#"+potencia;
+  complete = mac+"#"+potencia;
   Serial.println(complete);
   client.println(complete);
   
@@ -209,15 +207,12 @@ void loop() {
   Serial.println("Enviando Mensagem ao Server:");
 
   // Verifica se há dados disponíveis no Serial
-  //returnMac();
-
+  //returnMac()
 
   fullMsn();
 
-
   //Passa a potencia do Wifi para o host
   Serial.println(potencia);
-  delay(10000);
 
 
 }

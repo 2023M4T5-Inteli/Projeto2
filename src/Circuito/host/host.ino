@@ -44,13 +44,13 @@ const char *password = "QazWsx@123";
 //--------------------------------------------------------------------------//
 
 //Contantes para comunicacao com Ubidots
-const char *UBIDOTS_TOKEN = "BBFF-UXLQPo0lxDPXTuR1TE0f8gTIkUDJti";  // Put here your Ubidots TOKEN
-const char *DEVICE_LABEL = "Kakinho";                               // Put here your Device label to which data  will be published
+const char *UBIDOTS_TOKEN = "BBFF-YjSV5EL4gwTUk2dbqC0Fuc97Y0zgm9";  // Put here your Ubidots TOKEN
+const char *DEVICE_LABEL = "klif";                               // Put here your Device label to which data  will be published
 const char *VARIABLE_LABEL = "desconectado";                        // Put here your Variable label to which data  will be published
 const char *VARIABLE_LABEL2 = "aguardando";                         // Put here your Variable label to which data  will be published
 const char *VARIABLE_LABEL3 = "conectado";                          // Put here your Variable label to which data  will be published
 const char *VARIABLE_LABEL4 = "status_estado_ESP";                  // Put here your Variable label to which data  will be published
-const char *VARIABLE_LABEL5 = "MAC_ADRESS";                         // Put here your Variable label to which data  will be published
+const char *VARIABLE_LABEL5 = "ID_SALA";                         // Put here your Variable label to which data  will be published
 const char *VARIABLE_LABEL6 = "potencia";                           // Put here your Variable label to which data  will be published
 
 //--------------------------------------------------------------------------//
@@ -69,7 +69,12 @@ WiFiClient client;
 
 String mac;
 String lugar;
-String potencia;
+String potencia = "";
+String mensagem = "";
+String clientMac = "";
+
+int separadorIndex = 0;
+String newMac = "";
 
 //--------------------------------------------------------------------------//
 
@@ -206,14 +211,16 @@ void mensagemClient() {
 
     mensagem = client.readStringUntil('\n');
 
-    String mac, potencia;
-    int separadorIndex = mensagem.indexOf(#);
+    
+    separadorIndex = mensagem.indexOf("#");
 
-    if(separadorIndex != -1){
-      mac = mensagem.substring(0,separadorIndex);
-      potencia = mensagem.substring(separadorIndex+1);
+    if (separadorIndex != -1) {
+      clientMac = mensagem.substring(0, separadorIndex);
+      potencia = mensagem.substring(separadorIndex + 1);
+      newMac=macToDecimal(clientMac);
+      newMac.replace(".","");
 
-      Serial.println("agora o mac é: "+mac+", e a potencia: "+potencia);
+      //Serial.println("agora o mac é: " + newMac + ", e a potencia: " + potencia);
     }
 
     // lcd.setCursor(0, 0);
@@ -223,16 +230,16 @@ void mensagemClient() {
     // String newMac = macToDecimal(mac);
     // newMac.replace(".", "");
 
-   }// else if (!client.available()) {
-  //   lcd.clear();
-  //   lcd.setCursor(0, 0);
-  //   lcd.print("Roubado");
-  //   lcd.setCursor(0, 1);
-  //   lcd.print(lugar);
+  } else if (!client.available()) {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Roubado");
+    lcd.setCursor(0, 1);
+    lcd.print(lugar);
 
-  //   Serial.println("Roubado");
-  //   delay(3000);
-  // }
+    Serial.println("Roubado");
+    delay(3000);
+  }
 }
 
 //--------------------------------------------------------------------------//
@@ -302,6 +309,15 @@ void loop() {
   // put your main code here, to run repeatedly:
   verificaCliente();
 
+  mensagemClient();
+
+  long id =newMac.toInt();
+  long dbm=potencia.toInt();
+
+  Serial.println(id);
+
+  Serial.println("Passou do mensagemClient");
+
   if (!ubidots.connected()) {
 
     ubidots.reconnect();
@@ -326,12 +342,10 @@ void loop() {
     ubidots.add(VARIABLE_LABEL4, distancCm);  // Insert your variable Labels and the value to be sent
     ubidots.publish(DEVICE_LABEL);
 
+    ubidots.add(VARIABLE_LABEL5, id);  // Insert your variable Labels and the value to be sent
+    ubidots.publish(DEVICE_LABEL);
 
-    float smValue = 1011;
-
-
-
-    ubidots.add(VARIABLE_LABEL5, smValue);  // Insert your variable Labels and the value to be sent
+    ubidots.add(VARIABLE_LABEL6, dbm);  // Insert your variable Labels and the value to be sent
     ubidots.publish(DEVICE_LABEL);
 
 
@@ -348,5 +362,6 @@ void loop() {
 
   //Chama a função verificaCliente.
   //Chama a função mensagemCliente.
-  mensagemClient();
+
+
 }
