@@ -204,43 +204,35 @@ void mensagemClient() {
 
 
 
-    mac = client.readStringUntil('\n');
-    lcd.setCursor(0, 0);
-    lcd.print(mac);
-    Serial.print("mac: ");
-    Serial.println(mac);
-    String newMac = macToDecimal(mac);
-    newMac.replace(".", "");
+    mensagem = client.readStringUntil('\n');
 
-    Serial.print("Endereço MAC em decimal: ");
-    Serial.println(newMac);
+    String mac, potencia;
+    int separadorIndex = mensagem.indexOf(#);
 
-    delay(5000);
+    if(separadorIndex != -1){
+      mac = mensagem.substring(0,separadorIndex);
+      potencia = mensagem.substring(separadorIndex+1);
 
-    lugar = client.readStringUntil('\n');
-    lcd.setCursor(0, 1);
-    lcd.print(lugar);
-    Serial.print("lugar: ");
-    Serial.println(lugar);
-    delay(5000);
+      Serial.println("agora o mac é: "+mac+", e a potencia: "+potencia);
+    }
 
-    potencia = client.readStringUntil('\n');
-    lcd.setCursor(0, 0);
-    lcd.print(potencia);
-    Serial.print("potencia: ");
-    Serial.println(potencia);
+    // lcd.setCursor(0, 0);
+    // lcd.print(mac);
+    // Serial.print("mac: ");
+    // Serial.println(mac);
+    // String newMac = macToDecimal(mac);
+    // newMac.replace(".", "");
 
-    delay(5000);
-  } else if (!client.available()) {
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Roubado");
-    lcd.setCursor(0, 1);
-    lcd.print(lugar);
+   }// else if (!client.available()) {
+  //   lcd.clear();
+  //   lcd.setCursor(0, 0);
+  //   lcd.print("Roubado");
+  //   lcd.setCursor(0, 1);
+  //   lcd.print(lugar);
 
-    Serial.println("Roubado");
-    delay(3000);
-  }
+  //   Serial.println("Roubado");
+  //   delay(3000);
+  // }
 }
 
 //--------------------------------------------------------------------------//

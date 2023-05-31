@@ -21,6 +21,8 @@ const int MAX_MACS = 5;
 String macs[MAX_MACS];
 int numMacs = 0;
 int cont = 0;
+String mensagem;
+String complete;
 
 //-------------------------------------------------------------------//
 
@@ -78,7 +80,7 @@ String returnMac() {
   String bssidStr = WiFi.BSSIDstr();  //pega a string do endereço mac
 
   //Salva o endereço MAC na varial mensagem
-  String mensagem = bssidStr;  // acho q o erro ta aqui, o bssidStr não está atualizando quando eu uso o replace
+  mensagem = bssidStr;  // acho q o erro ta aqui, o bssidStr não está atualizando quando eu uso o replace
 
   mensagem.replace(":", "");
 
@@ -86,7 +88,6 @@ String returnMac() {
   client.available();
 
   // Envia o Endereço MAC e a potencia do sinal para o servidor
-  client.println(mensagem);
   Serial.println(mensagem);  // printa no Serial
   delay(5000);
   return mensagem;
@@ -126,27 +127,38 @@ void identificaLocal(String mensagem) {
 
   if (mensagem == macs[cont]) {
     Serial.println("marcos ta no 1");
-    client.println("marcos ta no 1");
+    //client.println("marcos ta no 1");
   }
   cont++;
   if (mensagem == macs[cont]) {
     Serial.println("marcos ta no 2");
-    client.println("marcos ta no 2");
+    //client.println("marcos ta no 2");
   }
   cont++;
   if (mensagem == macs[cont]) {
     Serial.println("marcos ta no 3");
-    client.println("marcos ta no 3");
+    //client.println("marcos ta no 3");
   }
   cont++;
   if (mensagem == macs[cont]) {
     Serial.println("marcos ta no 4");
-    client.println("marcos ta no 4");
+    //client.println("marcos ta no 4");
   }
   cont = 0;
 }
 
 //-------------------------------------------------------------------//
+
+void fullMsn(){
+  //chama a função identificaLocal() e passa como parametro a string de retorno da função returnMac()
+  Serial.println(mensagem);
+  Serial.println(potencia);
+  complete = mensagem+"#"+potencia;
+  Serial.println(complete);
+  client.println(complete);
+  
+
+}
 
 
 // void quebrou() {
@@ -197,20 +209,15 @@ void loop() {
   Serial.println("Enviando Mensagem ao Server:");
 
   // Verifica se há dados disponíveis no Serial
-  returnMac();
+  //returnMac();
 
-  //Delay de 10s
-  delay(10000);
 
-  //chama a função identificaLocal() e passa como parametro a string de retorno da função returnMac()
-  identificaLocal(returnMac());
+  fullMsn();
 
-  //Delay de 10s
-  delay(10000);
 
   //Passa a potencia do Wifi para o host
-  client.println(potencia);
   Serial.println(potencia);
   delay(10000);
+
 
 }
