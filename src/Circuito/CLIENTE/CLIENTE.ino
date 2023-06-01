@@ -8,8 +8,8 @@
 
 //----------------------------------------------------------------//
 
-const char* ssid = "Inteli-COLLEGE";
-const char* password = "QazWsx@123";
+const char* ssid = "SHARE-RESIDENTE";
+const char* password = "Share@residente23";
 const char* serverAddress = "10.128.71.32";  // Endereço IP local do servidor
 int serverPort = 3002;                        // Porta usada pelo servidor
 WiFiClient client;
@@ -79,16 +79,15 @@ void serverConect() {
 String returnMac() {
   String bssidStr = WiFi.BSSIDstr();  //pega a string do endereço mac
 
-  //Salva o endereço MAC na varial mensagem
-  String mensagem = bssidStr;  // acho q o erro ta aqui, o bssidStr não está atualizando quando eu uso o replace
+  //Salva o endereço MAC na varial bssidStr
 
-  mensagem.replace(":", "");
+  bssidStr.replace(":", "");
 
   //Verifica se o outro dispositivo mandou mensagem.
   client.available();
 
   // Envia o Endereço MAC e a potencia do sinal para o servidor
-  return mensagem;
+  return bssidStr;
 }
 
 
@@ -97,7 +96,6 @@ String fullmsn(String x) {
   //chama a função identificaLocal() e passa como parametro a string de retorno da função returnMac()
   // String mac = returnMac();
   // Serial.println(mac);
-  Serial.println(potencia);
   complete = x + "#" + potencia;
   Serial.println(complete);
   client.println(complete);
@@ -164,6 +162,51 @@ void identificaLocal(String mensagem) {
 //-------------------------------------------------------------------//
 
 
+void latitudeWifi(float & latitude,float & longitude ){
+  WiFi.scanNetworks();
+
+  int nRede = WiFi.scanComplete();
+  if (nRede == -2){
+    WiFi.scanNetworks(true);
+    return;
+  }  
+
+  if (nRede == 0) {
+    Serial.println("Nenhum ponto de acesso Wi-Fi encontrado");
+    return;
+  }
+
+  int bestSignal = -999;
+  int bestNetwork = -1;
+  for (int i = 0; i < nRede; i++) {
+    int signal = WiFi.RSSI(i);
+    if (signal > bestSignal) {
+      bestSignal = signal;
+      bestNetwork = i;
+    }
+  }
+
+  if (bestNetwork == -1) {
+    Serial.println("Falha ao obter a localização");
+    return;
+  }
+
+  latitude = WiFi.BSSID(bestNetwork)[0];
+  longitude = WiFi.BSSID(bestNetwork)[1];
+
+}
+
+
+
+
+
+
+
+
+
+
+
+//-------------------------------------------------------------------//
 
 // void quebrou() {
 //   digitalWrite(pinoTrig, LOW);
@@ -200,7 +243,22 @@ void setup() {
   //Chama a função infoRede
   infoRede();
   //Chama a função serverConect
-  serverConect();
+  //serverConect();
+
+
+
+
+  // Obter a latitude e a longitude aproximadas
+  float latitude, longitude;
+  latitudeWifi(latitude, longitude);
+
+  Serial.print("Latitude: ");
+  Serial.println(latitude, 6);
+  
+  Serial.print("Longitude: ");
+  Serial.println(longitude, 6);
+
+  
 }
 
 
@@ -211,6 +269,17 @@ void loop() {
 
   //Mostra no serial que está enviando a mensagem para o servidor.
   Serial.println("Enviando Mensagem ao Server:");
+
+  float latitude, longitude;
+  latitudeWifi(latitude, longitude);
+
+  Serial.print("Latitude: ");
+  Serial.println(latitude, 6);
+  
+  Serial.print("Longitude: ");
+  Serial.println(longitude, 6);
+
+  delay(5000);
 
   // Verifica se há dados disponíveis no Serial
   //returnMac()
