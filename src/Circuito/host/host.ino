@@ -202,7 +202,7 @@ void mensagemClient() {
       clientMac = mensagem.substring(0, separadorIndex);
       potencia = mensagem.substring(separadorIndex + 1);
     }
-  } else if (!client.available() && estadoAnterior == true) {
+  } else if ((!client.available()) && (estadoAnterior == true)) {
     estadoAnterior = false;
     qtdDesconectado++;
     digitalWrite(naoConectadoLedVermelho, HIGH);

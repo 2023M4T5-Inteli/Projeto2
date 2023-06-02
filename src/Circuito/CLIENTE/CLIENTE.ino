@@ -11,7 +11,7 @@
 const char* ssid = "Inteli-COLLEGE";
 const char* password = "QazWsx@123";
 const char* serverAddress = "10.128.71.32";  // Endereço IP local do servidor
-int serverPort = 3002;                        // Porta usada pelo servidor
+int serverPort = 8000;                       // Porta usada pelo servidor
 WiFiClient client;
 
 //-------------------------------------------------------------------//
@@ -34,6 +34,7 @@ const int pinoTrig = 26;
 const int pinoEcho = 27;
 float potencia;
 String sala;
+const int inicia = 2;
 
 //-------------------------------------------------------------------//
 
@@ -47,7 +48,7 @@ void wifiWait() {
 
 //-------------------------------------------------------------------//
 
-void infoRede() {
+void infRede() {
   //Retorna no Serial que o disponitivo esta conectado e o Indereço IP Local
   Serial.println("Conectado ao WiFi!");
   Serial.print("Endereço IP: ");
@@ -162,14 +163,14 @@ void identificaLocal(String mensagem) {
 //-------------------------------------------------------------------//
 
 
-void latitudeWifi(float & latitude,float & longitude ){
+void latitudeWifi(float& latitude, float& longitude) {
   WiFi.scanNetworks();
 
   int nRede = WiFi.scanComplete();
-  if (nRede == -2){
+  if (nRede == -2) {
     WiFi.scanNetworks(true);
     return;
-  }  
+  }
 
   if (nRede == 0) {
     Serial.println("Nenhum ponto de acesso Wi-Fi encontrado");
@@ -193,7 +194,6 @@ void latitudeWifi(float & latitude,float & longitude ){
 
   latitude = WiFi.BSSID(bestNetwork)[0];
   longitude = WiFi.BSSID(bestNetwork)[1];
-
 }
 
 
@@ -231,20 +231,19 @@ void latitudeWifi(float & latitude,float & longitude ){
 // }
 
 //-------------------------------------------------------------------//
-void distanciaCalc(float x){
+void distanciaCalc(float x) {
 
   Serial.println(x);
-  if((x<-10)&&(x>=-40)){
+  if ((x < -10) && (x >= -40)) {
 
     Serial.println("Zona segura A");
-  }else if((x<-40)&&(x>=-65)){
+  } else if ((x < -40) && (x >= -65)) {
     Serial.println("Zona Segura B");
-  }else if((x<-65)&&(x>=-100)){
+  } else if ((x < -65) && (x >= -100)) {
     Serial.println("Zona Segura C");
-  }else{
+  } else {
     Serial.println("Fora da Zona");
   }
-
 }
 
 
@@ -257,10 +256,11 @@ void setup() {
   WiFi.begin(ssid, password);
   //Chama a função wifiWait
   wifiWait();
-  //Chama a função infoRede
-  infoRede();
+  //Chama a função infRede
+  infRede();
   //Chama a função serverConect
   //serverConect();
+  pinMode(inicia, INPUT_PULLUP);
 
 
 
@@ -271,40 +271,48 @@ void setup() {
 
   // Serial.print("Latitude: ");
   // Serial.println(latitude, 6);
-  
+
   // Serial.print("Longitude: ");
   // Serial.println(longitude, 6);
-
-  
 }
 
 
 void loop() {
-    float nivelR= WiFi.RSSI();
-  //Funcao para envio de notificacao caso o ESP seja danificado
-  //  quebrou();
 
-  //Mostra no serial que está enviando a mensagem para o servidor.
- // Serial.println("Enviando Mensagem ao Server:");
+  client.println("Covas");
+  Serial.println(".");
+  client.println("Covas");
+  if (digitalRead(inicia) == LOW) {
+    while (true) {
+      client.println("marcos");
 
-  float latitude, longitude;
-  latitudeWifi(latitude, longitude);
+      float nivelR = WiFi.RSSI();
+      //Funcao para envio de notificacao caso o ESP seja danificado
+      //  quebrou();
 
-  Serial.print("Latitude: ");
-  Serial.println(latitude, 6);
-  
-  Serial.print("Longitude: ");
-  Serial.println(longitude, 6);
-  distanciaCalc(nivelR);
+      //Mostra no serial que está enviando a mensagem para o servidor.
+      // Serial.println("Enviando Mensagem ao Server:");
 
-  delay(5000);
+      float latitude, longitude;
+      latitudeWifi(latitude, longitude);
 
-  // Verifica se há dados disponíveis no Serial
-  //returnMac()
-  //identificaLocal(returnMac());
-  // fullmsn();
-  //Serial.print(sala);
-  //Passa a potencia do Wifi para o host
-  //erial.println(potencia);
+      Serial.print("Latitude: ");
+      Serial.println(latitude, 6);
 
+      Serial.print("Longitude: ");
+      Serial.println(longitude, 6);
+      distanciaCalc(nivelR);
+
+
+      //Verifica se há dados disponíveis no Serial
+      String x = returnMac();
+
+      identificaLocal(x);
+
+      Serial.print(sala);
+      //Passa a potencia do Wifi para o host
+      //erial.println(potencia);
+      delay(5000);
+    }
+  }
 }
