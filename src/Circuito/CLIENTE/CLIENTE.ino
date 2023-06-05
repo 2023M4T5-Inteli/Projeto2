@@ -35,6 +35,7 @@ const int pinoEcho = 27;
 float potencia;
 String sala;
 const int inicia = 2;
+const int botaoResetCLIENTE = 32;
 
 //-------------------------------------------------------------------//
 
@@ -282,37 +283,42 @@ void loop() {
   client.println("Covas");
   Serial.println(".");
   client.println("Covas");
-  if (digitalRead(inicia) == LOW) {
-    while (true) {
-      client.println("marcos");
 
-      float nivelR = WiFi.RSSI();
-      //Funcao para envio de notificacao caso o ESP seja danificado
-      //  quebrou();
+  client.println("marcos");
 
-      //Mostra no serial que está enviando a mensagem para o servidor.
-      // Serial.println("Enviando Mensagem ao Server:");
+  float nivelR = WiFi.RSSI();
+  //Funcao para envio de notificacao caso o ESP seja danificado
+  //  quebrou();
 
-      float latitude, longitude;
-      latitudeWifi(latitude, longitude);
+  //Mostra no serial que está enviando a mensagem para o servidor.
+  // Serial.println("Enviando Mensagem ao Server:");
 
-      Serial.print("Latitude: ");
-      Serial.println(latitude, 6);
+  float latitude, longitude;
+  latitudeWifi(latitude, longitude);
 
-      Serial.print("Longitude: ");
-      Serial.println(longitude, 6);
-      distanciaCalc(nivelR);
+  Serial.print("Latitude: ");
+  Serial.println(latitude, 6);
+
+  Serial.print("Longitude: ");
+  Serial.println(longitude, 6);
+  distanciaCalc(nivelR);
 
 
-      //Verifica se há dados disponíveis no Serial
-      String x = returnMac();
+  //Verifica se há dados disponíveis no Serial
+  String x = returnMac();
 
-      identificaLocal(x);
+  identificaLocal(x);
 
-      Serial.print(sala);
-      //Passa a potencia do Wifi para o host
-      //erial.println(potencia);
-      delay(5000);
-    }
-  }
+  Serial.print(sala);
+  //Passa a potencia do Wifi para o host
+  //erial.println(potencia);
+
+// Verifica se o botão de reset do CLIENTE foi pressionado
+  if (digitalRead(botaoResetCLIENTE) == LOW) {
+    Serial.println("Reiniciou");
+  // Reinicia o ESP32
+    ESP.restart();
 }
+}
+
+

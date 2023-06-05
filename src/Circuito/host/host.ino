@@ -32,6 +32,7 @@ const int pinoBuzzer = 25;
 const int pinoTrig = 26;
 const int pinoEcho = 27;
 const int inicia = 2;
+const int botaoResetHOST = 32;  // Pino do botão de reset do HOST
 
 //--------------------------------------------------------------------------//
 
@@ -88,6 +89,16 @@ const int conectadoLedVerde = 0;
 const int conectandoLedAmarelo = 2;
 
 int i;
+
+//--------------------------------------------------------------------------//
+
+void botaoReset() {
+  // Verifica se o botão de reset do HOST foi pressionado
+  if (digitalRead(botaoResetHOST) == HIGH) {
+    // Reinicia o ESP32
+    ESP.restart();
+  }
+}
 
 //--------------------------------------------------------------------------//
 
@@ -264,7 +275,7 @@ void setup() {
   pinMode(naoConectadoLedVermelho, OUTPUT);
   pinMode(conectandoLedAmarelo, OUTPUT);
   pinMode(conectadoLedVerde, OUTPUT);
-  pinMode(inicia , INPUT_PULLUP);
+  pinMode(inicia, INPUT_PULLUP);
   //Chama a função quebrou.
   // quebrou();
 
@@ -285,64 +296,65 @@ void setup() {
 
   //Chama a função LCD
   LCD();
+
+  // botaoReset();
 }
 
 void loop() {
 
-  if (digitalRead(inicia) == LOW) {
-    while (true) {
+  verificaCliente();
 
-      verificaCliente();
+  mensagemClient();
 
-      mensagemClient();
 
-      //Transformando variaveis em inteiro
-      long id = clientMac.toInt();
-      long dbm = 100 - potencia.toInt() * (-1);
 
-      // Serial.println(dbm);
-      // Serial.println(id);
+  //Transformando variaveis em inteiro
+  long id = clientMac.toInt();
+  long dbm = 100 - potencia.toInt() * (-1);
 
-      // Serial.println("Passou do mensagemClient");
+  // Serial.println(dbm);
+  // Serial.println(id);
 
-      if (!ubidots.connected()) {
+  // Serial.println("Passou do mensagemClient");
 
-        ubidots.reconnect();
-      }
+  if (!ubidots.connected()) {
 
-      if (abs(millis() - timer) > PUBLISH_FREQUENCY)  // triggers the routine every 5 seconds
-      {
-        int desconectado = digitalRead(naoConectadoLedVermelho);
-        int aguardando = digitalRead(conectandoLedAmarelo);
-        int conectado = digitalRead(conectadoLedVerde);
-
-        ubidots.add(VARIABLE_LABEL, desconectado);  // Insert your variable Labels and the value to be sent
-        ubidots.publish(DEVICE_LABEL);
-
-        ubidots.add(VARIABLE_LABEL2, aguardando);  // Insert your variable Labels and the value to be sent
-        ubidots.publish(DEVICE_LABEL);
-
-        ubidots.add(VARIABLE_LABEL3, conectado);  // Insert your variable Labels and the value to be sent
-        ubidots.publish(DEVICE_LABEL);
-
-        ubidots.add(VARIABLE_LABEL4, distancCm);  // Insert your variable Labels and the value to be sent
-        ubidots.publish(DEVICE_LABEL);
-
-        ubidots.add(VARIABLE_LABEL5, id);  // Insert your variable Labels and the value to be sent
-        ubidots.publish(DEVICE_LABEL);
-
-        ubidots.add(VARIABLE_LABEL6, dbm);  // Insert your variable Labels and the value to be sent
-        ubidots.publish(DEVICE_LABEL);
-
-        ubidots.add(VARIABLE_LABEL7, qtdDesconectado);  // Insert your variable Labels and the value to be sent
-        ubidots.publish(DEVICE_LABEL);
-
-        timer = millis();
-        ubidots.loop();
-      }
-
-      //Chama a função quebrou.
-      quebrou();
-    }
+    ubidots.reconnect();
   }
+
+  if ((long)(millis() - timer) > PUBLISH_FREQUENCY)  // triggers the routine every 5 seconds
+  {
+    int desconectado = digitalRead(naoConectadoLedVermelho);
+    int aguardando = digitalRead(conectandoLedAmarelo);
+    int conectado = digitalRead(conectadoLedVerde);
+
+    ubidots.add(VARIABLE_LABEL, desconectado);  // Insert your variable Labels and the value to be sent
+    ubidots.publish(DEVICE_LABEL);
+
+    ubidots.add(VARIABLE_LABEL2, aguardando);  // Insert your variable Labels and the value to be sent
+    ubidots.publish(DEVICE_LABEL);
+
+    ubidots.add(VARIABLE_LABEL3, conectado);  // Insert your variable Labels and the value to be sent
+    ubidots.publish(DEVICE_LABEL);
+
+    ubidots.add(VARIABLE_LABEL4, distancCm);  // Insert your variable Labels and the value to be sent
+    ubidots.publish(DEVICE_LABEL);
+
+    ubidots.add(VARIABLE_LABEL5, id);  // Insert your variable Labels and the value to be sent
+    ubidots.publish(DEVICE_LABEL);
+
+    ubidots.add(VARIABLE_LABEL6, dbm);  // Insert your variable Labels and the value to be sent
+    ubidots.publish(DEVICE_LABEL);
+
+    ubidots.add(VARIABLE_LABEL7, qtdDesconectado);  // Insert your variable Labels and the value to be sent
+    ubidots.publish(DEVICE_LABEL);
+
+    timer = millis();
+    ubidots.loop();
+  }
+
+  //Chama a função quebrou.
+  quebrou();
+
+  botaoReset();
 }
