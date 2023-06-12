@@ -10,12 +10,12 @@
 
 ## Integrantes: 
 - <a href="https://www.linkedin.com/in/eduarda-gonzaga-009794219/">Eduarda Gonzaga</a>
-- <a href="https://www.linkedin.com/in/yago-ara%C3%BAjo-do-vale-moreira-461816247/">Yago Araújo</a>
 - <a href="https://www.linkedin.com/in/lfcovas97/">Luiz Fernando Covas</a> 
-- <a href="https://www.linkedin.com/in/marcos-teixeira-37676a24a/">Marcos Teixeira</a> 
-- <a href="https://www.linkedin.com/in/thomaz-klifson-falc%C3%A3o-barboza-046490125/">Thomaz Klifson</a>
-- <a href="https://www.linkedin.com/in/raab-iane/">Raab Iane</a> 
+- <a href="https://www.linkedin.com/in/marcos-teixeira-37676a24a/">Marcos Teixeira</a>
 - <a href="https://www.linkedin.com/in/mauricio-felicissimo-475024240//">Mauricio Felicissimo</a>
+- <a href="https://www.linkedin.com/in/raab-iane/">Raab Iane</a>
+- <a href="https://www.linkedin.com/in/thomaz-klifson-falc%C3%A3o-barboza-046490125/">Thomaz Klifson</a>
+- <a href="https://www.linkedin.com/in/yago-ara%C3%BAjo-do-vale-moreira-461816247/">Yago Araújo</a>
 
 ## 📝 Descrição
 
@@ -84,7 +84,7 @@ O conteúdo do documento "Manual de Instruções" que serve como guia para a exe
 
 ## 📋 Licença/License
 
-<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"><p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><a property="dct:title" rel="cc:attributionURL" href="https://github.com/Spidus/Teste_Final_1">MODELO GIT INTELI</a> by <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://www.yggbrasil.com.br/vr">Inteli, Eduarda Gonzaga, Yago Araújo, Luis Fernando Covas, Marcos Teixeira, Thomaz Klifson, Raab Iane, Mauricio Felicissimo </a> is licensed under <a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">Attribution 4.0 International</a>.</p>
+<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"><p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><a property="dct:title" rel="cc:attributionURL" href="https://github.com/Spidus/Teste_Final_1">MODELO GIT INTELI</a> by <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://www.yggbrasil.com.br/vr">Inteli, Eduarda Gonzaga, Luis Fernando Covas, Marcos Teixeira, Mauricio Felicissimo, Thomaz Klifson, Raab Iane, Yago Araújo</a> is licensed under <a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">Attribution 4.0 International</a>.</p>
 
 ## 🎓 Referências
 
