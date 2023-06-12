@@ -1,83 +1,74 @@
-#include <Wire.h>
+
+#include <WiFi.h>
+#include "UbidotsEsp32Mqtt.h"
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
-#include <WiFi.h>
-#include <HTTPClient.h>
 
-// Replace with your Wi-Fi credentials
-const char *ssid = "Inteli-COLLEGE";
-const char *password = "QazWsx@123";
 
-// Replace with your Ubidots token and variable ID
-const char *ubidotsToken = "BBFF-nroDIloBgvPC2MMff5Evh51fMMWxQr";
-const char *variableID = "bme280testetemp";
 
-// Create an instance of the BME280 sensor
+const char *UBIDOTS_TOKEN = "BBFF-nroDIloBgvPC2MMff5Evh51fMMWxQr";
+const char *WIFI_SSID = "Asgard DECO";      // Put here your Wi-Fi SSID
+const char *WIFI_PASS = "28081907";      // Put here your Wi-Fi password
+const char *DEVICE_LABEL = "PonderadaS6Mauricio";   // Replace with the device label to subscribe to
+const char *VARIABLE_LABEL = "twmp"; // Replace with your variable label to subscribe to
+
+const int PUBLISH_FREQUENCY = 5000; 
+
+unsigned long timer;
+uint8_t analogPin = 20; 
+
 Adafruit_BME280 bme;
 
-// Ubidots HTTP endpoint
-const char* ubidotsURL = "http://industrial.api.ubidots.com/api/v1.6/devices/esp32";
+Ubidots ubidots(UBIDOTS_TOKEN);
 
-void setup() {
-  // Start the serial communication
+
+
+void callback(char *topic, byte *payload, unsigned int length)
+{
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.print("] ");
+  for (int i = 0; i < length; i++)
+  {
+    Serial.print((char)payload[i]);
+  }
+  Serial.println();
+}
+
+
+
+void setup()
+{
+  // put your setup code here, to run once:
   Serial.begin(115200);
 
-  // Connect to Wi-Fi
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
-    Serial.println("Connecting to WiFi...");
-  }
-  Serial.println("Connected to WiFi");
+  bme.begin(0x76);
+  
+  // ubidots.setDebug(true);  // uncomment this to make debug messages available
+  ubidots.connectToWifi(WIFI_SSID, WIFI_PASS);
+  ubidots.setCallback(callback);
+  ubidots.setup();
+  ubidots.reconnect();
 
-  // Initialize the BME280 sensor
-  if (!bme.begin(0x76, &Wire)) {
-    Serial.println("Could not find a valid BME280 sensor, check wiring!");
-    while (1);
-  }
+  timer = millis();
 }
 
-void loop() {
-  // Read temperature from BME280 sensor
+void loop()
+{
+  //float rssi = WiFi.RSSI();
   float temperature = bme.readTemperature();
-
-  // Print temperature to serial monitor
-  Serial.print("Temperature: ");
-  Serial.print(temperature);
-  Serial.println(" °C");
-
-  // Send temperature to Ubidots
-  sendToUbidots(temperature);
-
-  delay(5000);
-}
-
-void sendToUbidots(float temperature) {
-  // Create JSON payload
-  String payload = "{\"temperature\":" + String(temperature) + "}";
-
-  // Create HTTP client
-  HTTPClient http;
-
-  // Set Ubidots API endpoint
-  http.begin(ubidotsURL);
-
-  // Set Ubidots token and content type header
-  http.addHeader("X-Auth-Token", ubidotsToken);
-  http.addHeader("Content-Type", "application/json");
-
-  // Send POST request to Ubidots
-  int httpResponseCode = http.POST(payload);
-
-  // Check if request was successful
-  if (httpResponseCode > 0) {
-    Serial.print("Ubidots response code: ");
-    Serial.println(httpResponseCode);
-  } else {
-    Serial.print("Error sending data to Ubidots. HTTP error code: ");
-    Serial.println(httpResponseCode);
+  // put your main code here, to run repeatedly:
+  if (!ubidots.connected())
+  {
+    ubidots.reconnect();
   }
-
-  // Free resources
-  http.end();
+  if ((millis() - timer) > PUBLISH_FREQUENCY) // triggers the routine every 5 seconds
+  {
+    ubidots.add(VARIABLE_LABEL, temperature); // Insert your variable Labels and the value to be sent
+    ubidots.publish(DEVICE_LABEL);
+    timer = millis();
+  }
+  ubidots.loop();
+  Serial.println(temperature);
+  delay(2000);
 }
