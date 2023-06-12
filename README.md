@@ -50,7 +50,7 @@ Dentre os arquivos presentes na raiz do projeto, definem-se:
 
 ## 💻 Execução dos projetos
 
-O conteúdo do documento "Manual de Instruções" que serve como guia para a execução deste projeto está disponível na pasta "documentos". Alternativamente, é possível acessá-lo através do link a seguir: https://github.com/2023M4T5-Inteli/Projeto2/tree/main/documentos/T5_G2_V1_Instruction_Manual.pdf
+O conteúdo do documento "Manual de Instruções" que serve como guia para a execução deste projeto está disponível na pasta "documentos". Alternativamente, é possível acessá-lo através desse link: <a href = "https://github.com/2023M4T5-Inteli/Projeto2/blob/main/Documentos/T5_G2_V1_Instruction_Manual.pdf">Manual de Instruções</a>
 
 ## 🗃 Histórico de lançamentos e Adições
 
