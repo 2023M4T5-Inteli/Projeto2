@@ -28,7 +28,6 @@ KLIF é um dispositivo de rastreio para tablets/notebooks dentro da fábrica da 
 |--> Imagens<br>
 |--> src<br>
  &emsp; &emsp;|--> Circuito<br>
- &emsp; &emsp;|--> WebApp<br>
 | readme.md<br>
 | license.txt
 
