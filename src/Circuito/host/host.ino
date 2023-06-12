@@ -2,17 +2,17 @@
 #include <WiFiClient.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
+// #include <Adafruit_Sensor.h>
+// #include <Adafruit_BME280.h>
 #include "UbidotsEsp32Mqtt.h"
 
 //--------------------------------------------------------------------------//
 
 // Define o endereço do display LCD (verificar com o datasheet do módulo I2C)
 #define LCD_ADDRESS 0x27
-
 // Define o número de colunas e linhas do display LCD
 #define LCD_COLUMNS 21
 #define LCD_ROWS 22
-
 //Define variaveis para a funcao do sensor ultrasonico
 #define velocidade_som 0.034
 #define polegadas 0.40
@@ -28,19 +28,17 @@ LiquidCrystal_I2C lcd(LCD_ADDRESS, LCD_COLUMNS, LCD_ROWS);
 long duracao;
 float distancCm;
 float distanciaInch;
-const int pinoBuzzer = 25;
-const int pinoTrig = 26;
-const int pinoEcho = 27;
-const int inicia = 2;
-const int botaoResetHOST = 32;  // Pino do botão de reset do HOST
+const int pinoBuzzer = 25;  //Pino padrao do sensor
+const int pinoTrig = 26;    //Pino padrao do sensor
+const int pinoEcho = 27;    //Pino padrao do sensor
 
 //--------------------------------------------------------------------------//
 
-int contadorDesconexao = 0;  // Variável para contabilizar desconexões
-bool estadoAnterior = false;
+int qtdDesconectado = 0;  // Variável para contabilizar desconexões
+bool estadoAnterior = false; //Variavel para auxilo das contagens
 
 //Outras variaveis
-int qtdDesconectado = 0;
+const int botaoResetHOST = 32;
 int separadorIndex = 0;
 int mac_adress;
 String mac;
@@ -49,10 +47,15 @@ String potencia = "";
 String mensagem = "";
 String clientMac = "";
 String newMac = "";
+bool clientDesconectado = false;
+float temperatura;
+
 
 //Nome e Senha da rede WIFI
-const char *ssid = "Inteli-COLLEGE";
-const char *password = "QazWsx@123";
+// const char *ssid = "Inteli-COLLEGE";
+// const char *password = "QazWsx@123";
+const char *ssid = "SHARE-RESIDENTE";
+const char *password = "Share@residente23";
 
 //--------------------------------------------------------------------------//
 
@@ -64,8 +67,10 @@ const char *VARIABLE_LABEL2 = "aguardando";                         // Put here 
 const char *VARIABLE_LABEL3 = "conectado";                          // Put here your Variable label to which data  will be published
 const char *VARIABLE_LABEL4 = "status_estado_ESP";                  // Put here your Variable label to which data  will be published
 const char *VARIABLE_LABEL5 = "ID_SALA";                            // Put here your Variable label to which data  will be published
-const char *VARIABLE_LABEL6 = "potencia";
-const char *VARIABLE_LABEL7 = "Quantidade vezes desconectada";  // Put here your Variable label to which data  will be published
+const char *VARIABLE_LABEL6 = "potencia";                           // Put here your Variable label to which data  will be published
+const char *VARIABLE_LABEL7 = "Quantidade vezes desconectada";      // Put here your Variable label to which data  will be published
+const char *VARIABLE_LABEL8 = "Zona";                               // Put here your Variable label to which data  will be published
+const char *VARIABLE_LABEL9 = "temperatura";
 
 //--------------------------------------------------------------------------//
 
@@ -74,31 +79,20 @@ const int PUBLISH_FREQUENCY = 200;  // Update rate in milliseconds
 unsigned long timer;
 
 Ubidots ubidots(UBIDOTS_TOKEN);
-
 //Inicia Server na porta 80
 WiFiServer server(3002);
-
 //Cria uma variavel client
 WiFiClient client;
+// Create an instance of the BME280 sensor
+// Adafruit_BME280 bme;
 
 //--------------------------------------------------------------------------//
 
-//dado nome aos LEDS
+//dando nome aos LEDS
 const int naoConectadoLedVermelho = 15;
 const int conectadoLedVerde = 0;
 const int conectandoLedAmarelo = 2;
-
 int i;
-
-//--------------------------------------------------------------------------//
-
-void botaoReset() {
-  // Verifica se o botão de reset do HOST foi pressionado
-  if (digitalRead(botaoResetHOST) == HIGH) {
-    // Reinicia o ESP32
-    ESP.restart();
-  }
-}
 
 //--------------------------------------------------------------------------//
 
@@ -114,6 +108,16 @@ void callback(char *topic, byte *payload, unsigned int length) {
 
 //--------------------------------------------------------------------------//
 
+void botaoReset() {
+  // Verifica se o botão de reset do HOST foi pressionado
+  if (digitalRead(botaoResetHOST) == HIGH) {
+    // Reinicia o ESP32
+    ESP.restart();
+  }
+}
+
+//--------------------------------------------------------------------------//
+
 void LCD() {
   // Inicializa a comunicação I2C com o display LCD
   Wire.begin();
@@ -125,27 +129,28 @@ void LCD() {
 
 //--------------------------------------------------------------------------//
 
-void quebrou() {
-  digitalWrite(pinoTrig, LOW);
-  delayMicroseconds(2);
-  digitalWrite(pinoTrig, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(pinoTrig, LOW);
-  duracao = pulseIn(pinoEcho, HIGH);         // Calcule a distância
-  distancCm = duracao * velocidade_som / 2;  // Converter para centimetros
-  distanciaInch = distancCm * polegadas;     // Converter para polegadas
-  if (distancCm > 7) {
-    digitalWrite(pinoBuzzer, HIGH);
-    Serial.print("ESP32 retirado do dispositivo!!!");
-    delay(2000);
-    digitalWrite(pinoBuzzer, LOW);
-  }
-  // Serial.print("Distancia (cm): ");  // Imprime a distância no Serial Monitor
-  // Serial.println(distancCm);
-  // Serial.print("Distancia (inch): ");
-  // Serial.println(distanciaInch);
-  delay(1000);
-}
+//Função para identificar que o ESP32 foi danificado e enviar e-mail
+// void quebrou() {
+//   digitalWrite(pinoTrig, LOW);
+//   delayMicroseconds(2);
+//   digitalWrite(pinoTrig, HIGH);
+//   delayMicroseconds(10);
+//   digitalWrite(pinoTrig, LOW);
+//   duracao = pulseIn(pinoEcho, HIGH);         // Calcule a distância
+//   distancCm = duracao * velocidade_som / 2;  // Converter para centimetros
+//   distanciaInch = distancCm * polegadas;     // Converter para polegadas
+//   if (distancCm > 7) {
+//     digitalWrite(pinoBuzzer, HIGH);
+//     Serial.print("ESP32 retirado do dispositivo!!!");
+//     delay(2000);
+//     digitalWrite(pinoBuzzer, LOW);
+//   }
+//   Serial.print("Distancia (cm): ");  // Imprime a distância no Serial Monitor
+//   Serial.println(distancCm);
+//   Serial.print("Distancia (inch): ");
+//   Serial.println(distanciaInch);
+//   delay(1000);
+// }
 
 //--------------------------------------------------------------------------//
 
@@ -154,6 +159,7 @@ void connectWifi() {
   while (WiFi.status() != WL_CONNECTED) {
     digitalWrite(naoConectadoLedVermelho, HIGH);
     delay(1000);
+    digitalWrite(naoConectadoLedVermelho, LOW);
     Serial.println("Conectando ao WiFi...");
   }
 }
@@ -170,43 +176,53 @@ void infoNet() {
 
 //--------------------------------------------------------------------------//
 
+//inicia o server na porta 80
 void iniciaServer() {
-  //inicia o server na porta 80
   server.begin();
   Serial.println("Servidor iniciado na porta 3002.");
 }
 
 //--------------------------------------------------------------------------//
 
+// Aguarda conexão de um cliente (outro ESP32) e enquanto não conecta ele pisca o led amarelo na protoboard
 void verificaCliente() {
-  // Aguarda conexão de um cliente (outro ESP32) e enquanto não conecta ele pisca o led amarelo na protoboard
+  lcd.begin(16, 2);
   if (!client || !client.connected()) {
     client = server.available();
     digitalWrite(conectandoLedAmarelo, HIGH);
     delay(1000);
     digitalWrite(conectandoLedAmarelo, LOW);
     delay(1000);
-    Serial.println("Cliente ainda não conectado");
-
+    Serial.println("Aguardando client");
+    lcd.setCursor(0, 0);
+    lcd.print("Aguardando");
+    lcd.setCursor(0, 1);
+    lcd.print("client");
     return;
   }
   digitalWrite(conectadoLedVerde, HIGH);
-  digitalWrite(naoConectadoLedVermelho, LOW);
 }
 
 //--------------------------------------------------------------------------//
 
 void mensagemClient() {
   //Verifica se o client(ESP32) mandou alguma mensagem.
+  if (!client.available()) {
+    clientDesconectado = true;
+  }
 
   // Inicializa o LCD
   lcd.begin(16, 2);
 
   if (client.available()) {
-    Serial.print("Conectado");
+    clientDesconectado = false;
+
+    Serial.println("Conectado");
     estadoAnterior = true;
+
     // Lê a mensagem enviada pelo cliente
     mensagem = client.readStringUntil('\n');
+
     separadorIndex = mensagem.indexOf("#");
 
     if (separadorIndex != -1) {
@@ -225,17 +241,6 @@ void mensagemClient() {
     Serial.println("ESP Desconectado");
     Serial.println(qtdDesconectado);
     delay(3000);
-    // } else if (client.available() && estadoAnterior = f) {
-    //     estadoAnterior = true;  // Atualiza o estado anterior para conectado
-    //     // conectado = true;
-    //     // Lê a mensagem enviada pelo cliente
-    //     mensagem = client.readStringUntil('\n');
-    //     separadorIndex = mensagem.indexOf("#");
-
-    //     if (separadorIndex != -1) {
-    //       clientMac = mensagem.substring(0, separadorIndex);
-    //       potencia = mensagem.substring(separadorIndex + 1);
-    //     }
   }
 }
 
@@ -253,6 +258,45 @@ void alertaConexao(int led, char *message) {
 
 //--------------------------------------------------------------------------//
 
+int distanciaCalc(float x) {
+  lcd.begin(16, 2);
+  lcd.clear();
+  int zonas;
+
+  Serial.println(x);
+  if ((x < -10) && (x >= -40)) {
+    Serial.println("Zona segura A");
+    Serial.println("Zonas= 1");
+    lcd.setCursor(0, 0);
+    lcd.print("Zona segura A");
+    zonas = 1;
+    return zonas;
+
+  } else if ((x < -40) && (x >= -65)) {
+    Serial.println("Zona Segura B");
+    Serial.println("Zonas= 2");
+    lcd.setCursor(0, 0);
+    lcd.print("Zona segura B");
+    zonas = 2;
+    return zonas;
+
+  } else if ((x < -65) && (x >= -100)) {
+    Serial.println("Zona Segura C");
+    Serial.println("Zonas= 3");
+    lcd.setCursor(0, 0);
+    lcd.print("Zona segura C");
+    zonas = 3;
+    return zonas;
+  }
+  // else {
+  //   Serial.println("Fora da Zona");
+  //   lcd.setCursor(0, 1);
+  //   lcd.print("Fora de area");
+  // }
+}
+
+//--------------------------------------------------//
+
 void setup() {
   //Porta de saida para as informações(Porta Serial)
   Serial.begin(9600);
@@ -262,12 +306,12 @@ void setup() {
   ubidots.setCallback(callback);
   ubidots.setup();
   ubidots.reconnect();
-
   timer = millis();
 
   //Define os pinos de saida do Buzzer e do Trig
   pinMode(pinoTrig, OUTPUT);
   pinMode(pinoBuzzer, OUTPUT);
+
   //Define o pino de entrada do Som
   pinMode(pinoEcho, INPUT);
 
@@ -275,7 +319,7 @@ void setup() {
   pinMode(naoConectadoLedVermelho, OUTPUT);
   pinMode(conectandoLedAmarelo, OUTPUT);
   pinMode(conectadoLedVerde, OUTPUT);
-  pinMode(inicia, INPUT_PULLUP);
+
   //Chama a função quebrou.
   // quebrou();
 
@@ -285,9 +329,6 @@ void setup() {
   //Chama a função connectWifi.
   connectWifi();
 
-  //Desliga o Led vermelho assim que conecta ao Wifi
-  digitalWrite(naoConectadoLedVermelho, LOW);
-
   //Chama a função infoNet.
   infoNet();
 
@@ -296,39 +337,38 @@ void setup() {
 
   //Chama a função LCD
   LCD();
-
-  // botaoReset();
 }
+
 
 void loop() {
 
+  lcd.begin(16, 2);
+
+  // put your main code here, to run repeatedly:
   verificaCliente();
-
   mensagemClient();
-
-
 
   //Transformando variaveis em inteiro
   long id = clientMac.toInt();
   long dbm = 100 - potencia.toInt() * (-1);
+  int zona = potencia.toInt();
 
-  // Serial.println(dbm);
-  // Serial.println(id);
-
-  // Serial.println("Passou do mensagemClient");
+  Serial.println(dbm);
+  Serial.print("Seu ESP 32 está na sala ID: ");
+  Serial.println(id);
+  int zonaF = distanciaCalc(zona);
 
   if (!ubidots.connected()) {
-
     ubidots.reconnect();
   }
 
-  if ((long)(millis() - timer) > PUBLISH_FREQUENCY)  // triggers the routine every 5 seconds
+  if (abs(millis() - timer) > PUBLISH_FREQUENCY)  // triggers the routine every 5 seconds
   {
     int desconectado = digitalRead(naoConectadoLedVermelho);
     int aguardando = digitalRead(conectandoLedAmarelo);
     int conectado = digitalRead(conectadoLedVerde);
 
-    ubidots.add(VARIABLE_LABEL, desconectado);  // Insert your variable Labels and the value to be sent
+    ubidots.add(VARIABLE_LABEL, clientDesconectado);  // Insert your variable Labels and the value to be sent
     ubidots.publish(DEVICE_LABEL);
 
     ubidots.add(VARIABLE_LABEL2, aguardando);  // Insert your variable Labels and the value to be sent
@@ -349,12 +389,16 @@ void loop() {
     ubidots.add(VARIABLE_LABEL7, qtdDesconectado);  // Insert your variable Labels and the value to be sent
     ubidots.publish(DEVICE_LABEL);
 
+    ubidots.add(VARIABLE_LABEL8, zonaF);  // Insert your variable Labels and the value to be sent
+    ubidots.publish(DEVICE_LABEL);
+
+    ubidots.add(VARIABLE_LABEL9, temperatura);  // Insert your variable Labels and the value to be sent
+    ubidots.publish(DEVICE_LABEL);
+
     timer = millis();
     ubidots.loop();
   }
 
   //Chama a função quebrou.
-  quebrou();
-
-  botaoReset();
+  // quebrou();
 }
