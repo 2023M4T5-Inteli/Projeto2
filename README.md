@@ -27,7 +27,7 @@ KLIF é um dispositivo de rastreio para tablets/notebooks dentro da fábrica da 
 |--> Documentos<br>
 |--> Imagens<br>
 |--> src<br>
- &emsp; &emsp;|--> Circuito<br>
+ &emsp; |--> Circuito<br>
 | readme.md<br>
 | license.txt
 
@@ -60,16 +60,16 @@ O conteúdo do documento "Manual de Instruções" que serve como guia para a exe
     * Listagem dos Requisitos Funcionais
     * Protótipo Inicial com o Simulador Wokwi
     
-* 0.1.1 - 12/05/2023
+* 0.2.0 - 12/05/2023
     * Protótipo da Interface com o Usuário
     * Protótipo Físico (offline)
     * Listagem dos Requisitos Não Funcionais
     
-* 0.1.2 - 26/05/2023
+* 0.3.0 - 26/05/2023
     * Protótipo com MQTT e I2C
     * Arquitetura da Solução 
     
-* 0.1.3 - 07/06/2023
+* 0.4.0 - 07/06/2023
     * Código do Projeto
     * Projeto Físico (online)
     * Arquitetura do Protótipo
