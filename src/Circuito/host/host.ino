@@ -46,7 +46,6 @@ String lugar;
 String potencia = "";
 String mensagem = "";
 String clientMac = "";
-String newMac = "";
 
 // Variável para indicar se o cliente está desconectado
 bool clientDesconectado = false;
@@ -56,7 +55,7 @@ float temperatura;
 
 // Nome e Senha da rede WIFI
 const char *ssid = "SHARE-RESIDENTE";
-const char *password = "Share@residente23";
+const char *senha = "Share@residente23";
 
 //--------------------------------------------------------------------------//
 
@@ -102,7 +101,7 @@ int i;                                    // Variável de uso geral (sem nome es
 //--------------------------------------------------------------------------//
 
 void callback(char *topic, byte *payload, unsigned int length) {
-  Serial.print("Message arrived [");
+  Serial.print("Mensagem chegou [");
   Serial.print(topic);
   Serial.print("] ");
   
@@ -289,7 +288,7 @@ void setup() {
   Serial.begin(9600);
 
   // Estabelecendo conexão com o broker Ubidots
-  ubidots.connectToWifi(ssid, password);
+  ubidots.connectToWifi(ssid, senha);
   ubidots.setCallback(callback);
   ubidots.setup();
   ubidots.reconnect();
@@ -311,7 +310,7 @@ void setup() {
   // quebrou();
 
   // Conecta-se ao Wi-Fi utilizando o nome e senha da rede
-  WiFi.begin(ssid, password);
+  WiFi.begin(ssid, senha);
 
   // Chama a função connectWifi.
   connectWifi();
