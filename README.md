@@ -7,6 +7,7 @@
 # KLIF
 
 ## AUTOBOTS 
+![AutoBots](https://github.com/2023M4T5-Inteli/Projeto2/assets/110630077/9b613e71-b5da-4b4f-b7cd-15e36b0dadaa)
 
 ## Integrantes: 
 - <a href="https://www.linkedin.com/in/eduarda-gonzaga-009794219/">Eduarda Gonzaga</a>
@@ -27,7 +28,7 @@ KLIF é um dispositivo de rastreio para tablets/notebooks dentro da fábrica da 
 |--> Documentos<br>
 |--> Imagens<br>
 |--> src<br>
- &emsp; |--> Circuito<br>
+&emsp;|--> Circuito<br>
 | readme.md<br>
 | license.txt
 
@@ -44,9 +45,6 @@ Dentre os arquivos presentes na raiz do projeto, definem-se:
 - <b>readme.md</b>: Arquivo que serve como guia e explicação geral sobre o projeto (o mesmo que você está lendo agora).
 
 - <b>license.txt</b>: Arquivo com a licença de uso dos produtores do projeto.
-
-
-
 
 ## 💻 Execução dos projetos
 
