@@ -26,7 +26,7 @@ KLIF é um dispositivo de rastreio para tablets/notebooks dentro da fábrica da 
 
 |--> Apresentacoes<br>
 |--> Documentos<br>
-|--> Imagens<br>
+|--> imagens<br>
 |--> src<br>
 &emsp;|--> Circuito<br>
 | readme.md<br>
@@ -36,9 +36,9 @@ Dentre os arquivos presentes na raiz do projeto, definem-se:
 
 - <b>Apresentacoes</b>: Pasta com os arquivos em pdf de todas as apresentações do grupo.
 
-- <b>documentos</b>: Aqui estarão todos os documentos do projeto. 
+- <b>Documentos</b>: Aqui estarão todos os documentos do projeto. 
 
-- <b>Imagens</b>: Pasta com as imagens usadas no projeto.
+- <b>imagens</b>: Pasta com as imagens usadas no projeto.
 
 - <b>src</b>: Todo o código fonte criado para o desenvolvimento do projeto, incluindo os blocos de código do circuito e webapp.
 
@@ -48,7 +48,7 @@ Dentre os arquivos presentes na raiz do projeto, definem-se:
 
 ## 💻 Execução dos projetos
 
-O conteúdo do documento "Manual de Instruções" que serve como guia para a execução deste projeto está disponível na pasta "documentos". Alternativamente, é possível acessá-lo através desse link: <a href = "https://github.com/2023M4T5-Inteli/Projeto2/blob/main/Documentos/T5_G2_V1_Instruction_Manual.pdf">Manual de Instruções</a>
+O conteúdo do documento "Manual de Instruções" que serve como guia para a execução deste projeto está disponível na pasta "documentos". Alternativamente, é possível acessá-lo através desse link: <https://github.com/2023M4T5-Inteli/Projeto2/blob/main/Documentos/T5_G2_V1_Instruction_Manual.pdf/>
 
 ## 🗃 Histórico de lançamentos e Adições
 
