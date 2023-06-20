@@ -1,11 +1,11 @@
-#include <Arduino.h>
+// #include <Arduino.h>
 #include <EEPROM.h>     // We are going to read and write PICC's UIDs from/to EEPROMx
 #include <SPI.h>        // RC522 Module uses SPI protocol
 #include <MFRC522.h>  // Library for Mifare RC522 Devices
-#include <ESP32Servo.h>
 
-#define PIN_SERVO 14
-Servo myServo;
+
+// #define PIN_SERVO 14
+// Servo myServo;
 
 /*
   Instead of a Relay you may want to use a servo. Servos can lock and unlock door locks too
@@ -18,7 +18,7 @@ Servo myServo;
   to use common cathode led or just seperate leds, simply comment out #define COMMON_ANODE,
 */
 
-#define COMMON_ANODE
+/*#define COMMON_ANODE
 
 #ifdef COMMON_ANODE
 #define LED_ON LOW
@@ -26,14 +26,14 @@ Servo myServo;
 #else
 #define LED_ON HIGH
 #define LED_OFF LOW
-#endif
+#endif*/
 
-constexpr uint8_t redLed = 0;   // Set Led Pins
+constexpr uint8_t redLed = 16;   // Set Led Pins
 constexpr uint8_t greenLed = 4;
-constexpr uint8_t blueLed = 16;
+constexpr uint8_t blueLed = 0;
 
-constexpr uint8_t relay = 13;     // Set Relay Pin
-constexpr uint8_t wipeB = 33;     // Button pin for WipeMode
+constexpr uint8_t relay = 32;     // Set Relay Pin
+constexpr uint8_t wipeB = 15;     // Button pin for WipeMode
 
 boolean match = false;          // initialize card match to false
 boolean programMode = false;  // initialize programming mode to false
@@ -55,7 +55,7 @@ MFRC522 mfrc522(SS_PIN, RST_PIN);
 void setup() {
   EEPROM.begin(1024);
 
-  myServo.attach(PIN_SERVO);
+  // myServo.attach(PIN_SERVO);
 
   //Arduino Pin Configuration
   pinMode(redLed, OUTPUT);
@@ -74,10 +74,11 @@ void setup() {
   SPI.begin();           // MFRC522 Hardware uses SPI protocol
   mfrc522.PCD_Init();    // Initialize MFRC522 Hardware
 
-  myServo.write(0);
-  Serial.println("Servo locked");
+  // myServo.write(0);
+  // Serial.println("Servo locked");
+
   //If you set Antenna Gain to Max it will increase reading distance
-  //mfrc522.PCD_SetAntennaGain(mfrc522.RxGain_max);
+  // mfrc522.PCD_SetAntennaGain(mfrc522.RxGain_max);
 
   Serial.println(F("Controle de Acesso v0.1"));   // For debugging purposes
   ShowReaderDetails();  // Show details of PCD - MFRC522 Card Reader details
@@ -242,11 +243,11 @@ void granted ( uint16_t setDelay) {
   digitalWrite(redLed, LOW);  // Turn off red LED
   digitalWrite(greenLed, HIGH);   // Turn on green LED
   digitalWrite(relay, LOW);     // Unlock door!
-  myServo.write(180);
-  delay(setDelay);          // Hold door lock open for given seconds
+  // myServo.write(180);
+  delay(2000);          // Hold door lock open for given seconds
   digitalWrite(relay, HIGH);    // Relock door
-  myServo.write(0);
-  delay(1000);            // Hold green LED on for a second
+  // myServo.write(0);
+  // delay(1000);            // Hold green LED on for a second
 }
 
 ///////////////////////////////////////// Access Denied  ///////////////////////////////////
@@ -285,21 +286,21 @@ void ShowReaderDetails() {
   byte v = mfrc522.PCD_ReadRegister(mfrc522.VersionReg);
   Serial.print(F("Versao do software MFRC522: 0x"));
   Serial.println(v, HEX);
-  /*if (v == 0x91)
+  if (v == 0x91)
     Serial.print(F(" = v1.0"));
   else if (v == 0x92)
     Serial.print(F(" = v2.0"));
   else
     Serial.print(F(" (desconhecido),provavelmente um clone chines?"));
-  Serial.println("");*/
+  Serial.println("");
   // When 0x00 or 0xFF is returned, communication probably failed
   if ((v == 0x00) || (v == 0xFF)) {
     Serial.println(F("ALERTA: Falha na comunicacao, o modulo MFRC522 esta conectado corretamente?"));
     Serial.println(F("SISTEMA ABORTADO: Verifique as conexoes."));
     // Visualize system is halted
-    digitalWrite(greenLed, LED_OFF);  // Make sure green LED is off
-    digitalWrite(blueLed, LED_OFF);   // Make sure blue LED is off
-    digitalWrite(redLed, LED_ON);   // Turn on red LED
+    digitalWrite(greenLed, LOW);  // Make sure green LED is off
+    digitalWrite(blueLed, LOW);   // Make sure blue LED is off
+    digitalWrite(redLed, HIGH);   // Turn on red LED
     while (true); // do not go further
   }
 }
@@ -325,7 +326,7 @@ void normalModeOn () {
   digitalWrite(blueLed, HIGH);  // Blue LED ON and ready to read card
   digitalWrite(redLed, LOW);  // Make sure Red LED is off
   digitalWrite(greenLed, LOW);  // Make sure Green LED is off
-  digitalWrite(relay, LOW);    // Make sure Door is Locked
+  digitalWrite(relay, HIGH);    // Make sure Door is Locked
 }
 
 //////////////////////////////////////// Read an ID from EEPROM //////////////////////////////
@@ -433,57 +434,57 @@ boolean findID( byte find[] ) {
 ///////////////////////////////////////// Write Success to EEPROM   ///////////////////////////////////
 // Flashes the green LED 3 times to indicate a successful write to EEPROM
 void successWrite() {
-  digitalWrite(blueLed, LED_OFF);   // Make sure blue LED is off
-  digitalWrite(redLed, LED_OFF);  // Make sure red LED is off
-  digitalWrite(greenLed, LED_OFF);  // Make sure green LED is on
+  digitalWrite(blueLed, LOW);   // Make sure blue LED is off
+  digitalWrite(redLed, LOW);  // Make sure red LED is off
+  digitalWrite(greenLed, LOW);  // Make sure green LED is on
   delay(200);
-  digitalWrite(greenLed, LED_ON);   // Make sure green LED is on
+  digitalWrite(greenLed, HIGH);   // Make sure green LED is on
   delay(200);
-  digitalWrite(greenLed, LED_OFF);  // Make sure green LED is off
+  digitalWrite(greenLed, LOW);  // Make sure green LED is off
   delay(200);
-  digitalWrite(greenLed, LED_ON);   // Make sure green LED is on
+  digitalWrite(greenLed, HIGH);   // Make sure green LED is on
   delay(200);
-  digitalWrite(greenLed, LED_OFF);  // Make sure green LED is off
+  digitalWrite(greenLed, LOW);  // Make sure green LED is off
   delay(200);
-  digitalWrite(greenLed, LED_ON);   // Make sure green LED is on
+  digitalWrite(greenLed, HIGH);   // Make sure green LED is on
   delay(200);
 }
 
 ///////////////////////////////////////// Write Failed to EEPROM   ///////////////////////////////////
 // Flashes the red LED 3 times to indicate a failed write to EEPROM
 void failedWrite() {
-  digitalWrite(blueLed, LED_OFF);   // Make sure blue LED is off
-  digitalWrite(redLed, LED_OFF);  // Make sure red LED is off
-  digitalWrite(greenLed, LED_OFF);  // Make sure green LED is off
+  digitalWrite(blueLed, LOW);   // Make sure blue LED is off
+  digitalWrite(redLed, LOW);  // Make sure red LED is off
+  digitalWrite(greenLed, LOW);  // Make sure green LED is off
   delay(200);
-  digitalWrite(redLed, LED_ON);   // Make sure red LED is on
+  digitalWrite(redLed, HIGH);   // Make sure red LED is on
   delay(200);
-  digitalWrite(redLed, LED_OFF);  // Make sure red LED is off
+  digitalWrite(redLed, LOW);  // Make sure red LED is off
   delay(200);
-  digitalWrite(redLed, LED_ON);   // Make sure red LED is on
+  digitalWrite(redLed, HIGH);   // Make sure red LED is on
   delay(200);
-  digitalWrite(redLed, LED_OFF);  // Make sure red LED is off
+  digitalWrite(redLed, LOW);  // Make sure red LED is off
   delay(200);
-  digitalWrite(redLed, LED_ON);   // Make sure red LED is on
+  digitalWrite(redLed, HIGH);   // Make sure red LED is on
   delay(200);
 }
 
 ///////////////////////////////////////// Success Remove UID From EEPROM  ///////////////////////////////////
 // Flashes the blue LED 3 times to indicate a success delete to EEPROM
 void successDelete() {
-  digitalWrite(blueLed, LED_OFF);   // Make sure blue LED is off
-  digitalWrite(redLed, LED_OFF);  // Make sure red LED is off
-  digitalWrite(greenLed, LED_OFF);  // Make sure green LED is off
+  digitalWrite(blueLed, LOW);   // Make sure blue LED is off
+  digitalWrite(redLed, LOW);  // Make sure red LED is off
+  digitalWrite(greenLed, LOW);  // Make sure green LED is off
   delay(200);
-  digitalWrite(blueLed, LED_ON);  // Make sure blue LED is on
+  digitalWrite(blueLed, HIGH);  // Make sure blue LED is on
   delay(200);
-  digitalWrite(blueLed, LED_OFF);   // Make sure blue LED is off
+  digitalWrite(blueLed, LOW);   // Make sure blue LED is off
   delay(200);
-  digitalWrite(blueLed, LED_ON);  // Make sure blue LED is on
+  digitalWrite(blueLed, HIGH);  // Make sure blue LED is on
   delay(200);
-  digitalWrite(blueLed, LED_OFF);   // Make sure blue LED is off
+  digitalWrite(blueLed, LOW);   // Make sure blue LED is off
   delay(200);
-  digitalWrite(blueLed, LED_ON);  // Make sure blue LED is on
+  digitalWrite(blueLed, HIGH);  // Make sure blue LED is on
   delay(200);
 }
 
