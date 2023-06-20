@@ -3,6 +3,8 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include "UbidotsEsp32Mqtt.h"
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BME280.h>
 
 //--------------------------------------------------------------------------//
 
@@ -11,6 +13,8 @@
 // Define o número de colunas e linhas do display LCD
 #define LCD_COLUMNS 21
 #define LCD_ROWS 22
+// Define o endereço do BME280
+#define BME280_ADDRESS 0x76
 // Define variaveis para a funcao do sensor ultrasonico
 #define velocidade_som 0.034
 #define polegadas 0.40
@@ -19,6 +23,7 @@
 
 // Cria um objeto LiquidCrystal_I2C para controlar o display LCD
 LiquidCrystal_I2C lcd(LCD_ADDRESS, LCD_COLUMNS, LCD_ROWS);
+Adafruit_BME280 bme;
 
 //--------------------------------------------------------------------------//
 
@@ -54,8 +59,8 @@ bool clientDesconectado = false;
 float temperatura;
 
 // Nome e Senha da rede WIFI
-const char *ssid = "SHARE-RESIDENTE";
-const char *senha = "Share@residente23";
+const char *ssid = "Inteli-COLLEGE";
+const char *senha = "QazWsx@123";
 
 //--------------------------------------------------------------------------//
 
@@ -92,11 +97,11 @@ WiFiClient client;
 //--------------------------------------------------------------------------//
 
 // Dando nome aos LEDs
-const int naoConectadoLedVermelho = 15;    // LED vermelho indicando dispositivo não conectado
-const int conectadoLedVerde = 0;           // LED verde indicando dispositivo conectado
-const int conectandoLedAmarelo = 2;        // LED amarelo indicando dispositivo em processo de conexão
+const int naoConectadoLedVermelho = 15;  // LED vermelho indicando dispositivo não conectado
+const int conectadoLedVerde = 0;         // LED verde indicando dispositivo conectado
+const int conectandoLedAmarelo = 2;      // LED amarelo indicando dispositivo em processo de conexão
 
-int i;                                    // Variável de uso geral (sem nome específico)
+int i;  // Variável de uso geral (sem nome específico)
 
 //--------------------------------------------------------------------------//
 
@@ -104,12 +109,12 @@ void callback(char *topic, byte *payload, unsigned int length) {
   Serial.print("Mensagem chegou [");
   Serial.print(topic);
   Serial.print("] ");
-  
+
   // Imprime o payload da mensagem
   for (int i = 0; i < length; i++) {
     Serial.print((char)payload[i]);
   }
-  
+
   Serial.println();  // Imprime uma nova linha
 }
 
@@ -283,6 +288,18 @@ int distanciaCalc(float x) {
 
 //--------------------------------------------------//
 
+// void pegaTemperatura() {
+
+//   // Realiza a leitura dos valores do sensor BME280
+//   float temperatura = bme.readTemperature();
+//   Serial.print("Temperatura: ");
+//   Serial.println(temperatura);
+//   float umidade = bme.readHumidity();
+//   float pressao = bme.readPressure() / 100.0;  // Converter para hPa
+// }
+
+//--------------------------------------------------//
+
 void setup() {
   // Porta de saída para as informações (Porta Serial)
   Serial.begin(9600);
@@ -331,6 +348,7 @@ void loop() {
   // Coloque seu código principal aqui, para ser executado repetidamente:
   verificaCliente();
   mensagemClient();
+  // pegaTemperatura();
 
   // Convertendo variáveis para inteiros
   long id = clientMac.toInt();
