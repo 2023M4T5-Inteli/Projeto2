@@ -4,12 +4,11 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 
-
-
-const char *UBIDOTS_TOKEN = "BBFF-nroDIloBgvPC2MMff5Evh51fMMWxQr";
-const char *WIFI_SSID = "Asgard DECO";      // Put here your Wi-Fi SSID
-const char *WIFI_PASS = "28081907";      // Put here your Wi-Fi password
-const char *DEVICE_LABEL = "PonderadaS6Mauricio";   // Replace with the device label to subscribe to
+//const char *UBIDOTS_TOKEN = "BBFF-nroDIloBgvPC2MMff5Evh51fMMWxQr";
+const char *UBIDOTS_TOKEN = "BBFF-YjSV5EL4gwTUk2dbqC0Fuc97Y0zgm9";
+const char *WIFI_SSID = "Inteli-College";      // Put here your Wi-Fi SSID
+const char *WIFI_PASS = "QazWsx@123";      // Put here your Wi-Fi password
+const char *DEVICE_LABEL = "mauricio";   // Replace with the device label to subscribe to
 const char *VARIABLE_LABEL = "twmp"; // Replace with your variable label to subscribe to
 
 const int PUBLISH_FREQUENCY = 5000; 
@@ -58,8 +57,7 @@ void loop()
   //float rssi = WiFi.RSSI();
   float temperature = bme.readTemperature();
   // put your main code here, to run repeatedly:
-  if (!ubidots.connected())
-  {
+  if (!ubidots.connected()){
     ubidots.reconnect();
   }
   if ((millis() - timer) > PUBLISH_FREQUENCY) // triggers the routine every 5 seconds
