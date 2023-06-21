@@ -10,7 +10,7 @@ const char* senha = "QazWsx@123";  //Senha do WiFi da Rede;
 
 const char* enderecoMac = "10.128.67.66";  // Endereço IP local do servidor
 
-int portaServidor = 8888;  // Porta usada pelo servidor;
+int portaServidor = 4002;  // Porta usada pelo servidor;
 
 const int frequenciaMensagem = 5000;
 unsigned long timerMensagem;
@@ -18,9 +18,9 @@ unsigned long timerMensagem;
 WiFiClient client;  //Salva WiFiClient em client;
 //-------------------------------------------------------------------//
 // Número máximo de endereços MAC que podem ser armazenados
-const int qntMacs = 5;
+const int qntMacs = 7;
 
-String macs[qntMacs] = { "FC5C45005FB8", "FC5C45006098", "FC5C45005CF8", "FC5C450062", "FC5C450063" };  //lista de endereços macs
+String macs[qntMacs] = { "FC5C45005FB8", "FC5C45006098", "FC5C45005CF8", "FC5C45004FC8", "FC5C45006358","FC5C45004D88","FC5C45006888" };  //lista de endereços macs
 
 int numMacs = 0;
 
@@ -188,11 +188,35 @@ void identificaLocal(String mensagem) {
 
     client.println(sala);  // Manda para o host a variavel "sala"
   }
+  if (macs[4] == mensagem) {
+
+    Serial.println("marcos ta no 5");  //printa no serial
+
+    sala = concatenaMensagem("5");  //guarda na variavel "sala" o resultado da função concatenaMensagem();
+
+    client.println(sala);  // Manda para o host a variavel "sala"
+  }
+  if (macs[5] == mensagem) {
+
+    Serial.println("marcos ta no 6");  //printa no serial
+
+    sala = concatenaMensagem("6");  //guarda na variavel "sala" o resultado da função concatenaMensagem();
+
+    client.println(sala);  // Manda para o host a variavel "sala"
+  }
+  if (macs[6] == mensagem) {
+
+    Serial.println("marcos ta no 7");  //printa no serial
+
+    sala = concatenaMensagem("7");  //guarda na variavel "sala" o resultado da função concatenaMensagem();
+
+    client.println(sala);  // Manda para o host a variavel "sala"
+  }
 }
 //-------------------------------------------------------------------//
   void reconect(float zona){
-    if (zona<-80){
-      daley(2000)
+    if (zona<-77){
+      delay(3000);
       ESP.restart();
     }
   }
@@ -275,7 +299,7 @@ void loop() {
   float zona = WiFi.RSSI();
   Serial.println(zona);
   reconect(zona);
-  conectaServidor();
+  
   }
 
   // Prita no Serial qual id da Sala ele está;
