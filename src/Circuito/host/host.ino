@@ -80,7 +80,7 @@ const char *VARIABLE_LABEL9 = "temperatura";
 //--------------------------------------------------------------------------//
 
 // Constante para a frequência de atualização em milissegundos
-const int PUBLISH_FREQUENCY = 200;
+unsigned long  int PUBLISH_FREQUENCY = 5000;
 const int frequenciaDeReset = 10000;
 
 // Variável para acompanhar o tempo
@@ -91,7 +91,7 @@ unsigned long timerReset;
 Ubidots ubidots(UBIDOTS_TOKEN);
 
 // Inicializa o servidor na porta 3002
-WiFiServer server(8888);
+WiFiServer server(4002);
 
 // Cria uma variável do tipo cliente
 WiFiClient client;
@@ -130,13 +130,13 @@ void botaoReset() {
   }
 }
 
-void resetHost() {
-  if (abs(millis() - timerReset) > frequenciaDeReset)  // triggers the routine every 5 seconds
-  {
-    ESP.restart();
-    timerReset = millis();
-  }
-}
+// void resetHost() {
+//   if (abs(millis() - timerReset) > frequenciaDeReset)  // triggers the routine every 5 seconds
+//   {
+//     ESP.restart();
+//     timerReset = millis();
+//   }
+// }
   //--------------------------------------------------------------------------//
 
   void LCD() {
@@ -258,7 +258,7 @@ void resetHost() {
 
   //--------------------------------------------------------------------------//
   void reconect(float zona){
-    if (zona<=-68){
+    if (zona<=-70){
       ESP.restart();
     }
   }
@@ -382,7 +382,7 @@ void resetHost() {
     }
 
     // Publica os valores no Ubidots a cada PUBLISH_FREQUENCY segundos
-    if (abs(millis() - timer) > PUBLISH_FREQUENCY) {
+    if ((millis() - timer) > PUBLISH_FREQUENCY) {
       int desconectado = digitalRead(naoConectadoLedVermelho);
       int aguardando = digitalRead(conectandoLedAmarelo);
       int conectado = digitalRead(conectadoLedVerde);
