@@ -40,7 +40,7 @@ Dentre os arquivos presentes na raiz do projeto, definem-se:
 
 - <b>imagens</b>: Pasta com as imagens usadas no projeto.
 
-- <b>src</b>: Todo o código fonte criado para o desenvolvimento do projeto, incluindo os blocos de código do circuito e webapp.
+- <b>src</b>: Todo o código fonte criado para o desenvolvimento do projeto.
 
 - <b>readme.md</b>: Arquivo que serve como guia e explicação geral sobre o projeto (o mesmo que você está lendo agora).
 
