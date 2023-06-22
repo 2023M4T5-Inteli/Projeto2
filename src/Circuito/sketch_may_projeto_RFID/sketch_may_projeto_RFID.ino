@@ -114,7 +114,11 @@ void setup() {
   Serial.println(F("-------------------"));
   Serial.println(F("Tudo está pronto"));
   Serial.println(F("Aguardando pelos chips para serem lidos"));
+<<<<<<< Updated upstream
   cycleLeds();   // Feedback visual para o usuário com os LEDs
+=======
+  // cycleLeds();    // Everything ready lets give user some feedback by cycling leds
+>>>>>>> Stashed changes
 
   EEPROM.commit();   // Salva as alterações na EEPROM
 }
@@ -198,6 +202,7 @@ void loop() {
   }
 }
 
+<<<<<<< Updated upstream
 //--------------------------------------------------//
 
 void granted(uint16_t setDelay) {
@@ -207,6 +212,20 @@ void granted(uint16_t setDelay) {
   digitalWrite(relay, LOW);      // Destrava a porta
   delay(2000);                   // Mantém a fechadura aberta pelo número de segundos especificado em setDelay
   digitalWrite(relay, HIGH);     // Trava a porta novamente
+=======
+/////////////////////////////////////////  Access Granted    ///////////////////////////////////
+void granted ( uint16_t setDelay) {
+  digitalWrite(blueLed, LOW);   // Turn off blue LED
+  digitalWrite(redLed, LOW);  // Turn off red LED
+  digitalWrite(greenLed, HIGH);   // Turn on green LED
+  digitalWrite(relay, LOW);     // Unlock door!
+  // myServo.write(180);
+  delay(3000);          // Hold door lock open for given seconds
+  // digitalWrite(relay, HIGH);    // Relock door
+  // myServo.write(0);
+  // delay(1000);            // Hold green LED on for a second
+  ESP.restart();
+>>>>>>> Stashed changes
 }
 
 //--------------------------------------------------//
