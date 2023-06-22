@@ -16,10 +16,10 @@ const char* enderecoMac = "10.128.69.3";  // Endereço IP local do servidor
 
 int portaServidor = 4002;  // Porta usada pelo servidor;
 
-const int frequenciaMensagem = 9000;
-const int reconecttar = 10000;
+const int frequenciaMensagem = 5000;
+const int reconecttar = 6000;
 unsigned long timerMensagem;
-int estadoQuebrado=0;
+int estadoQuebrado = 0;
 
 WiFiClient client;  // Salva WiFiClient em client;
 
@@ -27,9 +27,9 @@ WiFiClient client;  // Salva WiFiClient em client;
 
 // Número máximo de endereços MAC que podem ser armazenados
 
-const int qntMacs = 7;
+const int qntMacs = 8;
 
-String macs[qntMacs] = { "FC5C45005FB8", "FC5C45006098", "FC5C45005CF8", "FC5C45004FC8", "FC5C45006358", "FC5C45004D88", "FC5C45006888" };  //lista de endereços macs
+String macs[qntMacs] = { "FC5C45005FB8", "FC5C45006098", "FC5C45005CF8", "FC5C45004FC8", "FC5C45006358", "FC5C45004D88", "FC5C45006888","FC5C45006868" };  //lista de endereços macs
 
 int numMacs = 0;
 
@@ -90,7 +90,7 @@ void conectaServidor() {
   // Se o client não conecta no ip e na porta ele entra num loop que volta no Serial a mensagem : "Falha na conexão com o server."
   while (!client.connect(enderecoMac, portaServidor)) {
     Serial.println("Tentando conexão com o server.");
-    delay(1000);
+    // delay(1000);
   }
 }
 
@@ -162,7 +162,7 @@ void identificaLocal(String mensagem) {
 
     Serial.println("marcos ta no 1");  // Printa no serial
 
-    sala = concatenaMensagem("1",estadoQuebrado);  // Guarda na variável "sala" o resultado da função concatenaMensagem();
+    sala = concatenaMensagem("1", estadoQuebrado);  // Guarda na variável "sala" o resultado da função concatenaMensagem();
 
     client.println(sala);  // Manda para o host a variável "sala"
   }
@@ -171,7 +171,7 @@ void identificaLocal(String mensagem) {
 
     Serial.println("marcos ta no 2");  // Printa no serial
 
-    sala = concatenaMensagem("2",estadoQuebrado);  // Guarda na variável "sala" o resultado da função concatenaMensagem();
+    sala = concatenaMensagem("2", estadoQuebrado);  // Guarda na variável "sala" o resultado da função concatenaMensagem();
 
     client.println(sala);  // Manda para o host a variável "sala"
   }
@@ -180,7 +180,7 @@ void identificaLocal(String mensagem) {
 
     Serial.println("marcos ta no 3");  // Printa no serial
 
-    sala = concatenaMensagem("3",estadoQuebrado);  // Guarda na variável "sala" o resultado da função concatenaMensagem();
+    sala = concatenaMensagem("3", estadoQuebrado);  // Guarda na variável "sala" o resultado da função concatenaMensagem();
 
     client.println(sala);  // Manda para o host a variável "sala"
   }
@@ -189,7 +189,7 @@ void identificaLocal(String mensagem) {
 
     Serial.println("marcos ta no 4");  // Printa no serial
 
-    sala = concatenaMensagem("4",estadoQuebrado);  // Guarda na variável "sala" o resultado da função concatenaMensagem();
+    sala = concatenaMensagem("4", estadoQuebrado);  // Guarda na variável "sala" o resultado da função concatenaMensagem();
 
     client.println(sala);  // Manda para o host a variável "sala"
   }
@@ -198,7 +198,7 @@ void identificaLocal(String mensagem) {
 
     Serial.println("marcos ta no 5");  // Printa no serial
 
-    sala = concatenaMensagem("5",estadoQuebrado);  // Guarda na variável "sala" o resultado da função concatenaMensagem();
+    sala = concatenaMensagem("5", estadoQuebrado);  // Guarda na variável "sala" o resultado da função concatenaMensagem();
 
     client.println(sala);  // Manda para o host a variável "sala"
   }
@@ -207,7 +207,7 @@ void identificaLocal(String mensagem) {
 
     Serial.println("marcos ta no 6");  // Printa no serial
 
-    sala = concatenaMensagem("6",estadoQuebrado);  // Guarda na variável "sala" o resultado da função concatenaMensagem();
+    sala = concatenaMensagem("6", estadoQuebrado);  // Guarda na variável "sala" o resultado da função concatenaMensagem();
 
     client.println(sala);  // Manda para o host a variável "sala"
   }
@@ -216,7 +216,7 @@ void identificaLocal(String mensagem) {
 
     Serial.println("marcos ta no 7");  // Printa no serial
 
-    sala = concatenaMensagem("7",estadoQuebrado);  // Guarda na variável "sala" o resultado da função concatenaMensagem();
+    sala = concatenaMensagem("7", estadoQuebrado);  // Guarda na variável "sala" o resultado da função concatenaMensagem();
 
     client.println(sala);  // Manda para o host a variável "sala"
   }
@@ -253,7 +253,6 @@ void quebrou() {
     delay(2000);                     // Atraso de 2 segundos
     digitalWrite(pinoBuzzer, LOW);
     estadoQuebrado = 1;
-    
   }
 
   Serial.print("Distancia (cm): ");  // Imprime a distância em centímetros no monitor serial
@@ -288,17 +287,17 @@ void setup() {
 
 void loop() {
   // Verifica se o tempo decorrido desde a última mensagem é maior que a frequência desejada
+  // quebrou();
   conectaServidor();
-  // if (abs(millis() - timerMensagem) > frequenciaMensagem) {
-    identificaLocal(returnaMac());  // Chama a função identificaLocal() passando o endereço MAC retornado pela função returnaMac()
-    // timerMensagem = millis();       // Atualiza o valor do temporizador para o tempo atual
-    // if (abs(millis() - timerMensagem) > reconecttar) {
-      Serial.println("Entrou no reconect");  // Imprime a potência do sinal no monitor serial
-      float zona = WiFi.RSSI();              // Obtém a potência do sinal WiFi
-
-      Serial.println(zona);  // Imprime a potência do sinal no monitor serial
-      reconect(zona);        // Chama a função reconect() passando a potência do sinal WiFi
-    // }
-    // timerMensagem = millis();  // Atualiza o valor do temporizador para o tempo atual
-  // }
+  // // if (abs(millis() - timerMensagem) > frequenciaMensagem) {
+  identificaLocal(returnaMac());         // Chama a função identificaLocal() passando o endereço MAC retornado pela função returnaMac()
+  //                                        // timerMensagem = millis();       // Atualiza o valor do temporizador para o tempo atual
+  //                                        // if (abs(millis() - timerMensagem) > reconecttar) {
+  // Serial.println("Entrou no reconect");  // Imprime a potência do sinal no monitor serial
+  float zona = WiFi.RSSI();              // Obtém a potência do sinal WiFi
+  // Imprime a potência do sinal no monitor serial
+  reconect(zona);        // Chama a função reconect() passando a potência do sinal WiFi
+  //                        // }
+  //                        // timerMensagem = millis();  // Atualiza o valor do temporizador para o tempo atual
+  // // }
 }
