@@ -52,6 +52,7 @@ String lugar;
 String potencia = "";
 String mensagem = "";
 String clientMac = "";
+String estadoQuebrado = "";
 
 // Variável para indicar se o cliente está desconectado
 bool clientDesconectado = false;
@@ -77,6 +78,7 @@ const char *VARIABLE_LABEL6 = "potencia"; // Insira aqui o rótulo da variável 
 const char *VARIABLE_LABEL7 = "Quantidade vezes desconectada"; // Insira aqui o rótulo da variável para a qual os dados serão publicados
 const char *VARIABLE_LABEL8 = "Zona"; // Insira aqui o rótulo da variável para a qual os dados serão publicados
 const char *VARIABLE_LABEL9 = "temperatura"; // Insira aqui o rótulo da variável para a qual os dados serão publicados
+const char *VARIABLE_LABEL10 = "estadoQuebrou"; // Insira aqui o rótulo da variável para a qual os dados serão publicados
 
 //--------------------------------------------------------------------------//
 
@@ -219,10 +221,13 @@ void mensagemClient() {
     mensagem = client.readStringUntil('\n');
 
     separadorIndex = mensagem.indexOf("#");
+    separadorIndex2 = mensagem.indexOf("#", separadorIndex2 + 1);
 
     if (separadorIndex != -1) {
       clientMac = mensagem.substring(0, separadorIndex);
-      potencia = mensagem.substring(separadorIndex + 1);
+      potencia = mensagem.substring(separadorIndex + 1,separadorIndex2);
+      estadoQuebrado = mensagem.substring(separadorIndex2 + 1);
+
     }
   } else if ((!client.available()) && (estadoAnterior == true)) {
     estadoAnterior = false;  // Define o estado anterior como false, indicando que o cliente se desconectou
@@ -368,6 +373,7 @@ void loop() {
   long id = clientMac.toInt();
   long dbm = 100 - potencia.toInt() * (-1);
   int zona = potencia.toInt();
+  int estadoBuzzer = estadoQuebrado.toInt();
 
   Serial.println(dbm);
   Serial.print("Seu ESP32 está na sala ID: ");
@@ -416,6 +422,9 @@ void loop() {
     ubidots.publish(DEVICE_LABEL);
 
     ubidots.add(VARIABLE_LABEL9, temperatura);
+    ubidots.publish(DEVICE_LABEL);
+
+    ubidots.add(VARIABLE_LABEL10, estadoBuzzer);
     ubidots.publish(DEVICE_LABEL);
 
     timer = millis();
