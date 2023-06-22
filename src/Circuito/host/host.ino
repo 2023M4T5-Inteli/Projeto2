@@ -85,12 +85,12 @@ const char *VARIABLE_LABEL10 = "estadoQuebrado"; // Insira aqui o rótulo da var
 //--------------------------------------------------------------------------//
 
 // Constante para a frequência de atualização em milissegundos
-unsigned long int PUBLISH_FREQUENCY = 5000;
-const int frequenciaDeReset = 10000;
+unsigned long int PUBLISH_FREQUENCY = 4000;
+const int frequenciaDeReset = 6000;
 
 // Variável para acompanhar o tempo
 unsigned long timer;
-unsigned long timerReset;
+// unsigned long timerReset;
 
 // Instância do cliente Ubidots com o token fornecido
 Ubidots ubidots(UBIDOTS_TOKEN);
@@ -229,6 +229,7 @@ void mensagemClient() {
     if (separadorIndex != -1 && separadorIndex2 != -1) {
       clientMac = mensagem.substring(0, separadorIndex);
       potencia = mensagem.substring(separadorIndex + 1,separadorIndex2);
+      potencia = potencia.toInt();
       estadoQuebrado = mensagem.substring(separadorIndex2 + 1);
 
     }
@@ -302,6 +303,14 @@ int distanciaCalc(float x) {
     lcd.print("Zona segura C");
     zonas = 3;
     return zonas;
+  }else if(x<-500 && x>1){
+    Serial.println("Zona Perdida");
+    Serial.println("Zonas = Perda");
+    lcd.setCursor(0, 0);
+    lcd.print("Zona segura Perdida");
+    zonas = 0;
+    return zonas;
+
   }
 }
 
@@ -387,6 +396,8 @@ void loop() {
 
   // Calcula a zona de distância com base na potência
   int zonaF = distanciaCalc(zona);
+  Serial.print("A zonaF é: ");
+  Serial.println(zonaF);
 
   // Verifica a necessidade de reconectar o ESP32 com base na zona
   reconect(zona);
