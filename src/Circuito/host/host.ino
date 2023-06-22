@@ -11,10 +11,10 @@
 // Define o endereço do display LCD (verificar com o datasheet do módulo I2C)
 #define LCD_ADDRESS 0x27
 // Define o número de colunas e linhas do display LCD
-#define LCD_COLUMNS 21
-#define LCD_ROWS 22
+#define LCD_COLUMNS 16
+#define LCD_ROWS 2
 // Define o endereço do BME280
-#define BME280_ADDRESS 0x76
+#define BME280_ADDRESS 0x76 //ok
 // Define variaveis para a funcao do sensor ultrasonico
 #define velocidade_som 0.034
 #define polegadas 0.40
@@ -23,6 +23,7 @@
 
 // Cria um objeto LiquidCrystal_I2C para controlar o display LCD
 LiquidCrystal_I2C lcd(LCD_ADDRESS, LCD_COLUMNS, LCD_ROWS);
+
 Adafruit_BME280 bme;
 
 //--------------------------------------------------------------------------//
@@ -133,12 +134,11 @@ void botaoReset() {
 //--------------------------------------------------------------------------//
 
 void LCD() {
-  // Inicializa a comunicação I2C com o display LCD
-  Wire.begin();
-  // Inicializa o display LCD
-  lcd.init();
+  
   // Liga o backlight do display LCD
   lcd.backlight();
+  lcd.begin(16,2);
+  
 }
 
 //--------------------------------------------------------------------------//
@@ -301,7 +301,18 @@ int distanciaCalc(float x) {
 
 void setup() {
   // Porta de saída para as informações (Porta Serial)
+  Wire.begin();
+    // Inicialize o sensor BME280
+  if (!bme.begin(BME280_ADDRESS)) {
+    Serial.println("Não foi possível encontrar o sensor BME280. Verifique a conexão!");
+    while (1);
+  }
+
+  // Chama a função LCD
+  LCD();
+
   Serial.begin(9600);
+
 
   // Estabelecendo conexão com o broker Ubidots
   ubidots.connectToWifi(ssid, senha);
@@ -334,8 +345,6 @@ void setup() {
   // Chama a função iniciaServer.
   iniciaServer();
 
-  // Chama a função LCD
-  LCD();
 }
 
 void loop() {
@@ -344,6 +353,16 @@ void loop() {
   // Verifica se há um cliente conectado e processa as mensagens recebidas
   verificaCliente();
   mensagemClient();
+
+  // Leitura dos valores do BME280
+  float temperatura = bme.readTemperature();
+
+
+  Serial.print("Temp: ");
+  Serial.print(temperatura);
+  Serial.println(" C");
+
+
 
   // Convertendo variáveis para inteiros
   long id = clientMac.toInt();
