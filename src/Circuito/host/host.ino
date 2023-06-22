@@ -47,6 +47,8 @@ const int botaoResetHOST = 32;
 
 // Variáveis para manipulação de strings
 int separadorIndex = 0;
+
+int separadorIndex2 =0;
 String mac;
 String lugar;
 String potencia = "";
