@@ -192,7 +192,7 @@ void identificaLocal(String mensagem) {
 //-------------------------------------------------------------------//
   void reconect(float zona){
     if (zona<-80){
-      daley(2000)
+      delay(2000);
       ESP.restart();
     }
   }
@@ -269,7 +269,7 @@ void loop() {
   // Serial.println("Enviando Mensagem ao Server:");
 
   //chama a função identificaLocal() e passamos como argumento a função returnMac() que retorna uma string;
-  if (abs(millis() - timerMensagem) > frequenciaMensagem) {
+  if ((millis() - timerMensagem) > frequenciaMensagem) {
     identificaLocal(returnaMac());
     timerMensagem = millis();
   float zona = WiFi.RSSI();

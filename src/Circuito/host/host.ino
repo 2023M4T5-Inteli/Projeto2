@@ -130,13 +130,6 @@ void botaoReset() {
   }
 }
 
-// void resetHost() {
-//   if (abs(millis() - timerReset) > frequenciaDeReset)  // triggers the routine every 5 seconds
-//   {
-//     ESP.restart();
-//     timerReset = millis();
-//   }
-// }
   //--------------------------------------------------------------------------//
 
   void LCD() {
@@ -301,18 +294,7 @@ void botaoReset() {
     }
   }
 
-  //--------------------------------------------------//
-
-  // void pegaTemperatura() {
-
-  //   // Realiza a leitura dos valores do sensor BME280
-  //   float temperatura = bme.readTemperature();
-  //   Serial.print("Temperatura: ");
-  //   Serial.println(temperatura);
-  //   float umidade = bme.readHumidity();
-  //   float pressao = bme.readPressure() / 100.0;  // Converter para hPa
-  // }
-
+  
   //--------------------------------------------------//
 
   void setup() {
@@ -363,8 +345,6 @@ void botaoReset() {
     // Coloque seu código principal aqui, para ser executado repetidamente:
     verificaCliente();
     mensagemClient();
-    // resetHost();
-    // pegaTemperatura();
 
     // Convertendo variáveis para inteiros
     long id = clientMac.toInt();
@@ -387,6 +367,17 @@ void botaoReset() {
       int aguardando = digitalRead(conectandoLedAmarelo);
       int conectado = digitalRead(conectadoLedVerde);
 
+      // Adiciona as variáveis e seus valores ao Ubidots
+      addToUbidots();
+
+
+      timer = millis();
+      ubidots.loop();
+    }
+  }
+
+  void addToUbidots(){
+    
       // Adiciona as variáveis e seus valores ao Ubidots
       ubidots.add(VARIABLE_LABEL, clientDesconectado);
       ubidots.publish(DEVICE_LABEL);
@@ -414,8 +405,4 @@ void botaoReset() {
 
       ubidots.add(VARIABLE_LABEL9, temperatura);
       ubidots.publish(DEVICE_LABEL);
-
-      timer = millis();
-      ubidots.loop();
-    }
   }
