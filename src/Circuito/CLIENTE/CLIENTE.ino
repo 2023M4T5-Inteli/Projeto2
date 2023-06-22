@@ -12,7 +12,7 @@ const char* ssid = "Inteli-COLLEGE";  // Nome da Rede;
 
 const char* senha = "QazWsx@123";  // Senha do WiFi da Rede;
 
-const char* enderecoMac = "10.128.67.66";  // Endereço IP local do servidor
+const char* enderecoMac = "10.128.69.3";  // Endereço IP local do servidor
 
 int portaServidor = 4002;  // Porta usada pelo servidor;
 
@@ -89,7 +89,7 @@ void informacaoDaRede() {
 void conectaServidor() {
   // Se o client não conecta no ip e na porta ele entra num loop que volta no Serial a mensagem : "Falha na conexão com o server."
   while (!client.connect(enderecoMac, portaServidor)) {
-    Serial.println("Falha na conexão com o server.");
+    Serial.println("Tentando conexão com o server.");
     delay(1000);
   }
 }
@@ -226,7 +226,7 @@ void identificaLocal(String mensagem) {
 
 // Esta função verifica a intensidade do sinal WiFi e reconecta o ESP32 se o sinal estiver fraco (abaixo de -77 dBm)
 void reconect(float zona) {
-  if (zona < -77) {
+  if (zona < -82) {
     ESP.restart();  // Reiniciar o ESP32
   }
 }
@@ -289,16 +289,16 @@ void setup() {
 void loop() {
   // Verifica se o tempo decorrido desde a última mensagem é maior que a frequência desejada
   conectaServidor();
-  if (abs(millis() - timerMensagem) > frequenciaMensagem) {
+  // if (abs(millis() - timerMensagem) > frequenciaMensagem) {
     identificaLocal(returnaMac());  // Chama a função identificaLocal() passando o endereço MAC retornado pela função returnaMac()
-    timerMensagem = millis();       // Atualiza o valor do temporizador para o tempo atual
-    if (abs(millis() - timerMensagem) > reconecttar) {
+    // timerMensagem = millis();       // Atualiza o valor do temporizador para o tempo atual
+    // if (abs(millis() - timerMensagem) > reconecttar) {
       Serial.println("Entrou no reconect");  // Imprime a potência do sinal no monitor serial
       float zona = WiFi.RSSI();              // Obtém a potência do sinal WiFi
 
       Serial.println(zona);  // Imprime a potência do sinal no monitor serial
       reconect(zona);        // Chama a função reconect() passando a potência do sinal WiFi
-    }
-    timerMensagem = millis();  // Atualiza o valor do temporizador para o tempo atual
-  }
+    // }
+    // timerMensagem = millis();  // Atualiza o valor do temporizador para o tempo atual
+  // }
 }
