@@ -43,7 +43,7 @@ int qtdDesconectado = 0;
 bool estadoAnterior = false;
 
 // Constante para o botão de reset do HOST
-const int botaoResetHOST = 32;
+const int botaoResetHOST = 17;
 
 // Variáveis para manipulação de strings
 int separadorIndex = 0;
@@ -80,7 +80,7 @@ const char *VARIABLE_LABEL6 = "potencia"; // Insira aqui o rótulo da variável 
 const char *VARIABLE_LABEL7 = "Quantidade vezes desconectada"; // Insira aqui o rótulo da variável para a qual os dados serão publicados
 const char *VARIABLE_LABEL8 = "Zona"; // Insira aqui o rótulo da variável para a qual os dados serão publicados
 const char *VARIABLE_LABEL9 = "temperatura"; // Insira aqui o rótulo da variável para a qual os dados serão publicados
-const char *VARIABLE_LABEL10 = "estadoQuebrou"; // Insira aqui o rótulo da variável para a qual os dados serão publicados
+const char *VARIABLE_LABEL10 = "estadoQuebrado"; // Insira aqui o rótulo da variável para a qual os dados serão publicados
 
 //--------------------------------------------------------------------------//
 
@@ -106,7 +106,7 @@ WiFiClient client;
 // Dando nome aos LEDs
 const int naoConectadoLedVermelho = 15;  // LED vermelho indicando dispositivo não conectado
 const int conectadoLedVerde = 0;         // LED verde indicando dispositivo conectado
-const int conectandoLedAmarelo = 2;      // LED amarelo indicando dispositivo em processo de conexão
+// const int conectandoLedAmarelo = 2;      // LED amarelo indicando dispositivo em processo de conexão
 
 int i;  // Variável de uso geral (sem nome específico)
 
@@ -187,9 +187,9 @@ void verificaCliente() {
 
   if (!client || !client.connected()) {  // Se não há cliente conectado ou a conexão foi perdida
     client = server.available();  // Aguarda a conexão de um novo cliente
-    digitalWrite(conectandoLedAmarelo, HIGH);  // Acende o LED amarelo para indicar que está aguardando conexão
+    // digitalWrite(conectandoLedAmarelo, HIGH);  // Acende o LED amarelo para indicar que está aguardando conexão
     delay(1000);
-    digitalWrite(conectandoLedAmarelo, LOW);  // Apaga o LED amarelo
+    // digitalWrite(conectandoLedAmarelo, LOW);  // Apaga o LED amarelo
     delay(1000);
     Serial.println("Aguardando cliente");  // Imprime a mensagem no monitor serial
     lcd.setCursor(0, 0);  // Posiciona o cursor do display LCD na primeira linha
@@ -198,6 +198,7 @@ void verificaCliente() {
     lcd.print("cliente");  // Escreve "cliente" na segunda linha do display LCD
     return;
   }
+  lcd.clear();
 
   digitalWrite(conectadoLedVerde, HIGH);  // Acende o LED verde para indicar que um cliente está conectado
 }
@@ -223,9 +224,9 @@ void mensagemClient() {
     mensagem = client.readStringUntil('\n');
 
     separadorIndex = mensagem.indexOf("#");
-    separadorIndex2 = mensagem.indexOf("#", separadorIndex2 + 1);
+    separadorIndex2 = mensagem.indexOf("#", separadorIndex + 1);
 
-    if (separadorIndex != -1) {
+    if (separadorIndex != -1 && separadorIndex2 != -1) {
       clientMac = mensagem.substring(0, separadorIndex);
       potencia = mensagem.substring(separadorIndex + 1,separadorIndex2);
       estadoQuebrado = mensagem.substring(separadorIndex2 + 1);
@@ -337,7 +338,7 @@ void setup() {
 
   // Definição dos LEDs
   pinMode(naoConectadoLedVermelho, OUTPUT);
-  pinMode(conectandoLedAmarelo, OUTPUT);
+  // pinMode(conectandoLedAmarelo, OUTPUT);
   pinMode(conectadoLedVerde, OUTPUT);
 
   // Conecta-se ao Wi-Fi utilizando o nome e senha da rede
@@ -377,6 +378,9 @@ void loop() {
   int zona = potencia.toInt();
   int estadoBuzzer = estadoQuebrado.toInt();
 
+  Serial.print("estado quebrado: ");
+  Serial.println(estadoQuebrado);
+
   Serial.println(dbm);
   Serial.print("Seu ESP32 está na sala ID: ");
   Serial.println(id);
@@ -395,7 +399,7 @@ void loop() {
   // Publica os valores no Ubidots a cada PUBLISH_FREQUENCY segundos
   if ((millis() - timer) > PUBLISH_FREQUENCY) {
     int desconectado = digitalRead(naoConectadoLedVermelho);
-    int aguardando = digitalRead(conectandoLedAmarelo);
+    // int aguardando = digitalRead(conectandoLedAmarelo);
     int conectado = digitalRead(conectadoLedVerde);
 
     // Adiciona as variáveis e seus valores ao Ubidots
