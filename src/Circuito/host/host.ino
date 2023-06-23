@@ -14,7 +14,7 @@
 #define LCD_COLUMNS 16
 #define LCD_ROWS 2
 // Define o endereço do BME280
-#define BME280_ADDRESS 0x76 //ok
+#define BME280_ADDRESS 0x76
 // Define variaveis para a funcao do sensor ultrasonico
 #define velocidade_som 0.034
 #define polegadas 0.40
@@ -106,7 +106,6 @@ WiFiClient client;
 // Dando nome aos LEDs
 const int naoConectadoLedVermelho = 15;  // LED vermelho indicando dispositivo não conectado
 const int conectadoLedVerde = 0;         // LED verde indicando dispositivo conectado
-// const int conectandoLedAmarelo = 2;      // LED amarelo indicando dispositivo em processo de conexão
 
 int i;  // Variável de uso geral (sem nome específico)
 
@@ -138,7 +137,6 @@ void botaoReset() {
 //--------------------------------------------------------------------------//
 
 void LCD() {
-  
   // Liga o backlight do display LCD
   lcd.backlight();
   lcd.begin(16,2);
@@ -187,9 +185,6 @@ void verificaCliente() {
 
   if (!client || !client.connected()) {  // Se não há cliente conectado ou a conexão foi perdida
     client = server.available();  // Aguarda a conexão de um novo cliente
-    // digitalWrite(conectandoLedAmarelo, HIGH);  // Acende o LED amarelo para indicar que está aguardando conexão
-    delay(1000);
-    // digitalWrite(conectandoLedAmarelo, LOW);  // Apaga o LED amarelo
     delay(1000);
     Serial.println("Aguardando cliente");  // Imprime a mensagem no monitor serial
     lcd.setCursor(0, 0);  // Posiciona o cursor do display LCD na primeira linha
@@ -303,7 +298,7 @@ int distanciaCalc(float x) {
     lcd.print("Zona segura C");
     zonas = 3;
     return zonas;
-  }else if(x<-500 && x>1){
+  } else if(x<-500 && x>1){
     Serial.println("Zona Perdida");
     Serial.println("Zonas = Perda");
     lcd.setCursor(0, 0);
@@ -329,7 +324,6 @@ void setup() {
   LCD();
 
   Serial.begin(9600);
-
 
   // Estabelecendo conexão com o broker Ubidots
   ubidots.connectToWifi(ssid, senha);
@@ -374,12 +368,9 @@ void loop() {
   // Leitura dos valores do BME280
   float temperatura = bme.readTemperature();
 
-
   Serial.print("Temp: ");
   Serial.print(temperatura);
   Serial.println(" C");
-
-
 
   // Convertendo variáveis para inteiros
   long id = clientMac.toInt();

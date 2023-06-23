@@ -73,13 +73,13 @@ void informacaoDaRede() {
   // Retorna no Serial que o dispositivo esta conectado ao Wifi
   Serial.println("Conectado ao WiFi!");
 
-  Serial.print("Endereço IP: ");  // Printa o Endereço IP Local
+  Serial.print("Endereço IP: ");  // Imprime o Endereço IP Local
   Serial.println(WiFi.localIP());
 
   String bssidStr = WiFi.BSSIDstr();           // Pega o endereço mac em tempo real
-  Serial.print("Endereço MAC do roteador: ");  // Printa o endereço MAC
+  Serial.print("Endereço MAC do roteador: ");  // Imprime o endereço MAC
   Serial.println(bssidStr);
-  // Printa a Potencia do WiFi;
+  // Imprime a Potencia do WiFi;
   Serial.print("Potencia do sinal: ");
   Serial.println(potencia);
 }
@@ -113,7 +113,7 @@ String concatenaMensagem(String x, int y) {
 
   String mensagemParaHost = x + "#" + distancia + "#" + y;  // Salva na variável mensagemParaHost = o argumento que é passado pela função + "#" + a intensidade do sinal do wifi;
 
-  Serial.println(mensagemParaHost);  // Printa no serial
+  Serial.println(mensagemParaHost);  // Imprime no serial
   client.println(mensagemParaHost);  // Manda para o host a variável mensagemParaHost
 
   return mensagemParaHost;  // Retorna a string mensagemParaHost
@@ -160,7 +160,7 @@ void identificaLocal(String mensagem) {
 
   if (macs[0] == mensagem) {
 
-    Serial.println("marcos ta no 1");  // Printa no serial
+    Serial.println("marcos ta no 1");  // Imprime no serial
 
     sala = concatenaMensagem("1", estadoQuebrado);  // Guarda na variável "sala" o resultado da função concatenaMensagem();
 
@@ -169,7 +169,7 @@ void identificaLocal(String mensagem) {
 
   if (macs[1] == mensagem) {
 
-    Serial.println("marcos ta no 2");  // Printa no serial
+    Serial.println("marcos ta no 2");  // Imprime no serial
 
     sala = concatenaMensagem("2", estadoQuebrado);  // Guarda na variável "sala" o resultado da função concatenaMensagem();
 
@@ -178,7 +178,7 @@ void identificaLocal(String mensagem) {
 
   if (macs[2] == mensagem) {
 
-    Serial.println("marcos ta no 3");  // Printa no serial
+    Serial.println("marcos ta no 3");  // Imprime no serial
 
     sala = concatenaMensagem("3", estadoQuebrado);  // Guarda na variável "sala" o resultado da função concatenaMensagem();
 
@@ -187,7 +187,7 @@ void identificaLocal(String mensagem) {
 
   if (macs[3] == mensagem) {
 
-    Serial.println("marcos ta no 4");  // Printa no serial
+    Serial.println("marcos ta no 4");  // Imprime no serial
 
     sala = concatenaMensagem("4", estadoQuebrado);  // Guarda na variável "sala" o resultado da função concatenaMensagem();
 
@@ -196,7 +196,7 @@ void identificaLocal(String mensagem) {
 
   if (macs[4] == mensagem) {
 
-    Serial.println("marcos ta no 5");  // Printa no serial
+    Serial.println("marcos ta no 5");  // Imprime no serial
 
     sala = concatenaMensagem("5", estadoQuebrado);  // Guarda na variável "sala" o resultado da função concatenaMensagem();
 
@@ -205,7 +205,7 @@ void identificaLocal(String mensagem) {
 
   if (macs[5] == mensagem) {
 
-    Serial.println("marcos ta no 6");  // Printa no serial
+    Serial.println("marcos ta no 6");  // Imprime no serial
 
     sala = concatenaMensagem("6", estadoQuebrado);  // Guarda na variável "sala" o resultado da função concatenaMensagem();
 
@@ -214,7 +214,7 @@ void identificaLocal(String mensagem) {
 
   if (macs[6] == mensagem) {
 
-    Serial.println("marcos ta no 7");  // Printa no serial
+    Serial.println("marcos ta no 7");  // Imprime no serial
 
     sala = concatenaMensagem("7", estadoQuebrado);  // Guarda na variável "sala" o resultado da função concatenaMensagem();
 
@@ -287,17 +287,11 @@ void setup() {
 
 void loop() {
   // Verifica se o tempo decorrido desde a última mensagem é maior que a frequência desejada
-  // quebrou();
-  conectaServidor();
-  // // if (abs(millis() - timerMensagem) > frequenciaMensagem) {
-  identificaLocal(returnaMac());         // Chama a função identificaLocal() passando o endereço MAC retornado pela função returnaMac()
-  //                                        // timerMensagem = millis();       // Atualiza o valor do temporizador para o tempo atual
-  //                                        // if (abs(millis() - timerMensagem) > reconecttar) {
-  // Serial.println("Entrou no reconect");  // Imprime a potência do sinal no monitor serial
-  float zona = WiFi.RSSI();              // Obtém a potência do sinal WiFi
-  // Imprime a potência do sinal no monitor serial
-  reconect(zona);        // Chama a função reconect() passando a potência do sinal WiFi
-  //                        // }
-  //                        // timerMensagem = millis();  // Atualiza o valor do temporizador para o tempo atual
-  // // }
+  conectaServidor();  // Chama a função "conectaServidor()" para se conectar a um servidor
+
+  identificaLocal(returnaMac());  // Chama a função "identificaLocal()" e passa o endereço MAC retornado pela função "returnaMac()"
+
+  float zona = WiFi.RSSI();  // Obtém a potência do sinal WiFi
+
+  reconect(zona);  // Chama a função "reconect()" passando a potência do sinal WiFi
 }

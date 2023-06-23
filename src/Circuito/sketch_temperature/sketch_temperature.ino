@@ -35,7 +35,6 @@ void callback(char *topic, byte *payload, unsigned int length)
 void setup()
 {
   // Configuração inicial, executada uma vez:
-
   Serial.begin(115200);  // Inicia a comunicação serial
 
   bme.begin(0x76);  // Inicia o sensor BME280 com endereço 0x76
@@ -49,7 +48,6 @@ void setup()
 
 void loop()
 {
-  //float rssi = WiFi.RSSI();
   float temperature = bme.readTemperature();
   // Código principal a ser executado repetidamente:
   if (!ubidots.connected()){
